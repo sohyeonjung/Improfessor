@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
 import {
   SendVerificationEmailRequest,
@@ -59,11 +59,44 @@ const useAuth = () => {
     });
   };
 
+  // 로그아웃
+  const useLogout = () => {
+    return useMutation<ApiResponse<null>, Error, void>({
+      mutationFn: async () => {
+        const response = await axiosInstance.post('/api/users/logout');
+        return response.data;
+      },
+      onSuccess: () => {
+        // 토큰 제거
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        
+        // Authorization 헤더 제거
+        delete axiosInstance.defaults.headers.common['Authorization'];
+      },
+    });
+  };
+
+  // 인증 상태 확인
+  const useAuthStatus = () => {
+    return useQuery({
+      queryKey: ['authStatus'],
+      queryFn: () => {
+        const accessToken = localStorage.getItem('accessToken');
+        return !!accessToken;
+      },
+      staleTime: Infinity,
+      gcTime: Infinity,
+    });
+  };
+
   return {
     useSendVerificationEmail,
     useVerifyEmail,
     useRegister,
     useLogin,
+    useLogout,
+    useAuthStatus,
   };
 };
 

@@ -1,12 +1,39 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import useAuth from '@/hooks/useAuth';
 
 export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
+  const { useLogout, useAuthStatus } = useAuth();
+  const logoutMutation = useLogout();
+  const { data: isAuthenticated } = useAuthStatus();
+
+  // 초기 토큰 설정
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      // axiosInstance의 Authorization 헤더 설정은 lib/axios.ts에서 처리
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      setIsProfileOpen(false);
+      router.push('/');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      // 에러가 발생해도 로컬 토큰은 제거
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      setIsProfileOpen(false);
+      router.push('/');
+    }
+  };
 
   return (
     <header className="bg-white shadow relative">
@@ -39,51 +66,67 @@ export default function Header() {
               </svg>
             </Link>
 
-            {/* 프로필 드롭다운 */}
-            <div className="relative">
-              <button
-                className="flex items-center text-black hover:text-[#BCCCDC] transition-colors"
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {/* 로그인 상태에 따른 UI */}
+            {isAuthenticated ? (
+              /* 프로필 드롭다운 */
+              <div className="relative">
+                <button
+                  className="flex items-center text-black hover:text-[#BCCCDC] transition-colors"
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </button>
 
-              {/* 드롭다운 메뉴 */}
-              {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-[#BCCCDC]">
-                  <Link
-                    href="/mypage"
-                    className="block px-4 py-2 text-sm text-black hover:bg-[#D9EAFD]"
-                    onClick={() => setIsProfileOpen(false)}
-                  >
-                    마이페이지
-                  </Link>
-                  <button
-                    className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-[#D9EAFD]"
-                    onClick={() => {
-                      // TODO: 로그아웃 로직
-                      console.log('로그아웃');
-                      setIsProfileOpen(false);
-                      router.push('/login');
-                    }}
-                  >
-                    로그아웃
-                  </button>
-                </div>
-              )}
-            </div>
+                {/* 드롭다운 메뉴 */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-[#BCCCDC]">
+                    <Link
+                      href="/mypage"
+                      className="block px-4 py-2 text-sm text-black hover:bg-[#D9EAFD]"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      마이페이지
+                    </Link>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-[#D9EAFD] disabled:opacity-50"
+                      onClick={handleLogout}
+                      disabled={logoutMutation.isPending}
+                    >
+                      {logoutMutation.isPending ? '로그아웃 중...' : '로그아웃'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* 로그인/회원가입 버튼 */
+              <div className="flex items-center space-x-2">
+                <Link
+                  href="/login"
+                  className="text-black hover:text-[#BCCCDC] transition-colors"
+                >
+                  로그인
+                </Link>
+                <span className="text-gray-400">|</span>
+                <Link
+                  href="/signup"
+                  className="text-black hover:text-[#BCCCDC] transition-colors"
+                >
+                  회원가입
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

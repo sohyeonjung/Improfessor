@@ -1,6 +1,12 @@
+'use client';
+
 import Link from "next/link";
+import useAuth from "@/hooks/useAuth";
 
 export default function Home() {
+  const { useAuthStatus } = useAuth();
+  const { data: isAuthenticated } = useAuthStatus();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#D9EAFD] to-[#F8FAFC] relative">
       <div 
@@ -23,18 +29,29 @@ export default function Home() {
           </p>
           
           <div className="flex gap-6">
-            <Link 
-              href="/login"
-              className="px-8 py-3 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition"
-            >
-              로그인
-            </Link>
-            <Link
-              href="/signup"
-              className="px-8 py-3 bg-white text-black border border-[#BCCCDC] rounded-lg hover:bg-[#F8FAFC] transition"
-            >
-              회원가입
-            </Link>
+            {isAuthenticated ? (
+              <Link 
+                href="/generate"
+                className="px-8 py-3 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition"
+              >
+                문제 생성하기
+              </Link>
+            ) : (
+              <>
+                <Link 
+                  href="/login"
+                  className="px-8 py-3 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition"
+                >
+                  로그인
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-8 py-3 bg-white text-black border border-[#BCCCDC] rounded-lg hover:bg-[#F8FAFC] transition"
+                >
+                  회원가입
+                </Link>
+              </>
+            )}
           </div>
         </main>
       </div>
