@@ -24,6 +24,7 @@ export default function SignupPage() {
     confirmPassword: "",
     university: "",
     major: "",
+    referralCode: "",
   });
 
   const [isEmailVerified, setIsEmailVerified] = useState(false);
@@ -300,6 +301,20 @@ export default function SignupPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
                 placeholder="학과를 입력해주세요"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="referralCode" className="block text-sm font-medium text-black mb-2">
+                추천인 코드 <span className="text-black/50">(선택)</span>
+              </label>
+              <input
+                type="text"
+                id="referralCode"
+                value={formData.referralCode}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+                placeholder="추천인 코드를 입력해주세요"
               />
             </div>
 

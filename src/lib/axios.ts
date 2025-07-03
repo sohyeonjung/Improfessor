@@ -14,9 +14,9 @@ export const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   (config) => {
     // 토큰이 필요한 경우 여기서 처리
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -34,7 +34,7 @@ axiosInstance.interceptors.response.use(
     // 에러 처리 로직
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       // 인증 에러 처리
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
     }
     return Promise.reject(error);
   }
