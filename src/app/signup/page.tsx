@@ -156,7 +156,7 @@ export default function SignupPage() {
       />
       <Link 
         href="/"
-        className="absolute top-6 left-6 text-black hover:text-[#BCCCDC] transition-colors z-10"
+        className="absolute top-6 left-6 text-black hover:text-[#BCCCDC] transition-colors z-50"
       >
         <svg 
           className="w-6 h-6" 

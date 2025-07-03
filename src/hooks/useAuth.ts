@@ -1,12 +1,14 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
+import { getUserIdFromToken } from '@/lib/utils';
 import {
   SendVerificationEmailRequest,
   VerifyEmailRequest,
   RegisterRequest,
   LoginRequest,
   ApiResponse,
-  TokenData
+  TokenData,
+  UserInfo
 } from '@/types/auth';
 
 const useAuth = () => {
@@ -90,6 +92,23 @@ const useAuth = () => {
     });
   };
 
+  // 사용자 정보 가져오기
+  const useUserInfo = () => {
+    return useQuery<ApiResponse<UserInfo>>({
+      queryKey: ['userInfo'],
+      queryFn: async () => {
+        const userId = getUserIdFromToken();
+        if (!userId) {
+          throw new Error('사용자 ID를 찾을 수 없습니다.');
+        }
+        const response = await axiosInstance.get(`/api/users/${userId}`);
+        return response.data;
+      },
+      enabled: !!getUserIdFromToken(),
+      staleTime: 5 * 60 * 1000, // 5분
+    });
+  };
+
   return {
     useSendVerificationEmail,
     useVerifyEmail,
@@ -97,6 +116,7 @@ const useAuth = () => {
     useLogin,
     useLogout,
     useAuthStatus,
+    useUserInfo,
   };
 };
 

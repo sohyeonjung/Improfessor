@@ -32,6 +32,18 @@ export interface TokenData {
   refreshToken: string;
 }
 
+// 사용자 정보 타입
+export interface UserInfo {
+  userId: string;
+  email: string;
+  nickname: string;
+  university?: string;
+  major?: string;
+  freeCount: number;
+  recommendCount: number;
+  referralCode: string;
+}
+
 // API 응답 타입
 export interface ApiResponse<T = unknown> {
   status: string;

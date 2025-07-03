@@ -1,16 +1,68 @@
 'use client';
 
 import Header from "@/components/Header";
+import useAuth from "@/hooks/useAuth";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function MyPage() {
-  // 더미 사용자 정보 (추후 API 연동 예정)
-  const [email] = useState("pjw8365@naver.com");
-  const [nickname, setNickname] = useState("pjw8230");
-  const [university, setUniversity] = useState("건국대학교");
-  const [department] = useState("컴퓨터공학과");
-  const [referralCode] = useState("AB345F");
+  const router = useRouter();
+  const { useUserInfo, useAuthStatus } = useAuth();
+  const { data: isAuthenticated } = useAuthStatus();
+  const { data: userInfoResponse, isLoading, error } = useUserInfo();
+
+  // 로컬 상태 (수정 가능한 필드들)
+  const [nickname, setNickname] = useState("");
+  const [university, setUniversity] = useState("");
   const [inputReferral, setInputReferral] = useState("");
+
+  // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  if (!isAuthenticated) {
+    router.push('/login');
+    return null;
+  }
+
+  // 로딩 중일 때
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC]">
+        <Header />
+        <main className="max-w-xl mx-auto px-4 sm:px-6 lg:px-0 py-12">
+          <div className="text-center">로딩 중...</div>
+        </main>
+      </div>
+    );
+  }
+
+  // 에러가 있을 때
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC]">
+        <Header />
+        <main className="max-w-xl mx-auto px-4 sm:px-6 lg:px-0 py-12">
+          <div className="text-center text-red-600">사용자 정보를 불러오는데 실패했습니다.</div>
+        </main>
+      </div>
+    );
+  }
+
+  const userInfo = userInfoResponse?.data;
+
+  // 사용자 정보가 없을 때
+  if (!userInfo) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC]">
+        <Header />
+        <main className="max-w-xl mx-auto px-4 sm:px-6 lg:px-0 py-12">
+          <div className="text-center">사용자 정보를 찾을 수 없습니다.</div>
+        </main>
+      </div>
+    );
+  }
+
+  // 사용자 정보가 로드되면 로컬 상태 업데이트
+  const displayNickname = nickname || userInfo.nickname;
+  const displayUniversity = university || userInfo.university || "";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -26,7 +78,7 @@ export default function MyPage() {
             <label className="block text-sm font-medium text-black mb-2">사용자 이메일</label>
             <input
               type="email"
-              value={email}
+              value={userInfo.email}
               disabled
               className="w-full px-4 py-2 bg-[#F8FAFC] text-black rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
             />
@@ -37,7 +89,7 @@ export default function MyPage() {
             <label className="block text-sm font-medium text-black mb-2">사용자 닉네임</label>
             <input
               type="text"
-              value={nickname}
+              value={displayNickname}
               onChange={(e) => setNickname(e.target.value)}
               className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
             />
@@ -48,7 +100,7 @@ export default function MyPage() {
             <div className="flex gap-2">
               <input
                 type="text"
-                value={university}
+                value={displayUniversity}
                 onChange={(e) => setUniversity(e.target.value)}
                 placeholder="대학교 검색"
                 className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
@@ -62,9 +114,9 @@ export default function MyPage() {
             </div>
             <input
               type="text"
-              value={department}
+              value={userInfo.major || ""}
               disabled
-              className="w-full px-4 py-2 bg-[#F8FAFC] text-black rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
+              className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
             />
           </div>
 
@@ -88,7 +140,7 @@ export default function MyPage() {
           {/* 내 추천인 코드 */}
           <div className="bg-[#F8FAFC] p-4 rounded border border-[#BCCCDC]">
             <span className="text-black">내 추천인 코드 :</span>
-            <span className="ml-2 font-mono font-bold text-lg text-black">{referralCode}</span>
+            <span className="ml-2 font-mono font-bold text-lg text-black">{userInfo.referralCode}</span>
           </div>
 
           {/* 추천인 코드 입력 */}
