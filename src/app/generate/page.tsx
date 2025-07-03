@@ -1,7 +1,6 @@
 'use client';
 
 import Header from "@/components/Header";
-import Image from "next/image";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useProblem from "@/hooks/useProblem";
@@ -108,13 +107,39 @@ export default function GeneratePage() {
                   htmlFor="concept-upload"
                   className="inline-flex flex-col items-center cursor-pointer"
                 >
-                  <Image
-                    src="/upload-icon.svg"
-                    alt="Upload"
-                    width={48}
-                    height={48}
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                     className="mb-4"
-                  />
+                  >
+                    <path
+                      d="M24 32V16M16 24L24 16L32 24"
+                      stroke="#666"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8 32H40"
+                      stroke="#666"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <rect
+                      x="8"
+                      y="8"
+                      width="32"
+                      height="32"
+                      rx="4"
+                      stroke="#666"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                  </svg>
                   <span className="text-sm text-black mb-2">
                     {conceptFileName || '파일 선택하기'}
                   </span>
@@ -151,13 +176,39 @@ export default function GeneratePage() {
                   className="inline-flex flex-col items-center cursor-pointer"
                   onClick={handleFormatFileClick}
                 >
-                  <Image
-                    src="/upload-icon.svg"
-                    alt="Upload"
-                    width={48}
-                    height={48}
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 48 48"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                     className="mb-4"
-                  />
+                  >
+                    <path
+                      d="M24 32V16M16 24L24 16L32 24"
+                      stroke="#666"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8 32H40"
+                      stroke="#666"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <rect
+                      x="8"
+                      y="8"
+                      width="32"
+                      height="32"
+                      rx="4"
+                      stroke="#666"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                  </svg>
                   <span className="text-sm text-black mb-2">
                     {formatFileName || '파일 선택하기'}
                   </span>
