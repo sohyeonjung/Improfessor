@@ -126,8 +126,8 @@ export default function SignupPage() {
         password: formData.password,
         university: formData.university,
         major: formData.major,
-        freeCount: 0,
-        recommendCount: 0
+        freeCount: 5,
+        recommendCount: formData.referralCode ? 1 : 0
       });
       showAlert("회원가입이 완료되었습니다.");
       router.push("/login");
