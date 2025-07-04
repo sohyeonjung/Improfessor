@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Pagination from "@/components/Pagination";
 import NoticeModal from "@/components/NoticeModal";
 import useNotice from "@/hooks/useNotice";
+import { useAlert } from "@/context/AlertContext";
 import { Notice } from "@/types/notice";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -12,6 +13,7 @@ export default function AdminNoticePage() {
   const queryClient = useQueryClient();
   const { useNoticeList, useCreateNotice, useUpdateNotice, useDeleteNotice } = useNotice();
   const { data: noticeResponse, isLoading } = useNoticeList();
+  const { showAlert, showConfirm } = useAlert();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,17 +46,17 @@ export default function AdminNoticePage() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = async (noticeId: number) => {
-    if (window.confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
+  const handleDeleteClick = (noticeId: number) => {
+    showConfirm('정말로 이 공지사항을 삭제하시겠습니까?', async () => {
       try {
         await deleteNoticeMutation.mutateAsync(noticeId);
         queryClient.invalidateQueries({ queryKey: ['notices'] });
-        alert('공지사항이 삭제되었습니다.');
+        showAlert('공지사항이 삭제되었습니다.');
       } catch (error) {
-        alert('공지사항 삭제에 실패했습니다.');
+        showAlert('공지사항 삭제에 실패했습니다.');
         console.error('공지사항 삭제 실패:', error);
       }
-    }
+    });
   };
 
   if (isLoading) {
@@ -156,18 +158,18 @@ export default function AdminNoticePage() {
             try {
               if (modalMode === 'create') {
                 await createNoticeMutation.mutateAsync(data);
-                alert('공지사항이 생성되었습니다.');
+                showAlert('공지사항이 생성되었습니다.');
               } else if (modalMode === 'edit' && selectedNotice) {
                 await updateNoticeMutation.mutateAsync({
                   noticeId: selectedNotice.noticeId,
                   data,
                 });
-                alert('공지사항이 수정되었습니다.');
+                showAlert('공지사항이 수정되었습니다.');
               }
               queryClient.invalidateQueries({ queryKey: ['notices'] });
               setIsModalOpen(false);
             } catch (error) {
-              alert('공지사항 저장에 실패했습니다.');
+              showAlert('공지사항 저장에 실패했습니다.');
               console.error('공지사항 저장 실패:', error);
             }
           }}
