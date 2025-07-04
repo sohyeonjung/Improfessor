@@ -15,7 +15,6 @@ export default function Home() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          opacity: '0.3',
         }}
       />
       <div className="container mx-auto px-4 min-h-screen flex flex-col items-center justify-center relative z-10">
