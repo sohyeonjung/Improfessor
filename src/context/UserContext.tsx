@@ -32,40 +32,41 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  // 토큰에서 사용자 ID 추출 및 변경 감지
+  // 토큰에서 사용자 ID 추출
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('accessToken');
       if (token) {
         const extractedUserId = getUserIdFromToken();
-        if (extractedUserId !== userId) {
-          setUserId(extractedUserId);
-        }
+        setUserId(extractedUserId);
       } else {
-        if (userId !== null) {
-          setUserId(null);
-          // 토큰이 없어지면 사용자 정보 캐시 제거
-          queryClient.removeQueries({ queryKey: ['userInfo'] });
-        }
+        setUserId(null);
+        queryClient.removeQueries({ queryKey: ['userInfo'] });
       }
     };
 
-    // 초기 체크
     checkToken();
 
-    // storage 이벤트 리스너 (다른 탭에서 로그인/로그아웃 시)
+    // storage 이벤트 리스너
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'accessToken') {
         checkToken();
       }
     };
 
+    // 커스텀 이벤트 리스너
+    const handleTokenChange = () => {
+      checkToken();
+    };
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('tokenChange', handleTokenChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('tokenChange', handleTokenChange);
     };
-  }, [userId, queryClient]);
+  }, [queryClient]);
 
   // 사용자 정보 조회
   const {
@@ -88,7 +89,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   });
 
   // isAuthenticated: 사용자 정보가 성공적으로 로드되었는지 확인
-  const isAuthenticated = !isLoading && !error && !!userInfoResponse?.data;
+  const isAuthenticated = !!userInfoResponse?.data;
 
   const value: UserContextType = {
     user: userInfoResponse?.data || null,

@@ -60,10 +60,12 @@ const useAuth = () => {
         // Authorization 헤더 설정
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
         
-        // 사용자 ID 추출
+        // 토큰 변경 이벤트 발생
+        window.dispatchEvent(new Event('tokenChange'));
+        
+        // 사용자 ID 추출 후 바로 사용자 정보 가져오기
         const userId = getUserIdFromToken();
         if (userId) {
-          // 바로 사용자 정보 가져오기
           try {
             const userResponse = await axiosInstance.get(`/api/users/${userId}`);
             // 사용자 정보를 캐시에 저장
@@ -90,6 +92,9 @@ const useAuth = () => {
         
         // Authorization 헤더 제거
         delete axiosInstance.defaults.headers.common['Authorization'];
+        
+        // 토큰 변경 이벤트 발생
+        window.dispatchEvent(new Event('tokenChange'));
         
         // 사용자 정보 캐시 제거
         queryClient.removeQueries({ queryKey: ['userInfo'] });
