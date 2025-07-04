@@ -33,9 +33,8 @@ export const useNotice = () => {
   const useCreateNotice = () => {
     return useMutation({
       mutationFn: async (data: CreateNoticeRequest) => {
-        const response = await axiosInstance.post('/api/notices', {
-          ...data,
-          userId: user?.userId,
+        const response = await axiosInstance.post('/api/notices', data, {
+          params: { userId: user?.userId }
         });
         return response.data;
       },
@@ -46,9 +45,8 @@ export const useNotice = () => {
   const useUpdateNotice = () => {
     return useMutation({
       mutationFn: async ({ noticeId, data }: { noticeId: number; data: CreateNoticeRequest }) => {
-        const response = await axiosInstance.patch(`/api/notices/${noticeId}`, {
-          ...data,
-          userId: user?.userId,
+        const response = await axiosInstance.patch(`/api/notices/${noticeId}`, data, {
+          params: { userId: user?.userId }
         });
         return response.data;
       },
@@ -60,7 +58,7 @@ export const useNotice = () => {
     return useMutation({
       mutationFn: async (noticeId: number) => {
         const response = await axiosInstance.delete(`/api/notices/${noticeId}`, {
-          data: { userId: user?.userId },
+          params: { userId: user?.userId }
         });
         return response.data;
       },
