@@ -1,8 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
 import { NoticeResponse, NoticeDetailResponse, CreateNoticeRequest } from '@/types/notice';
+import { useUser } from '@/context/UserContext';
 
 export const useNotice = () => {
+  const { user } = useUser();
+
   // 공지사항 목록 조회
   const useNoticeList = () => {
     return useQuery<NoticeResponse>({
@@ -30,7 +33,10 @@ export const useNotice = () => {
   const useCreateNotice = () => {
     return useMutation({
       mutationFn: async (data: CreateNoticeRequest) => {
-        const response = await axiosInstance.post('/api/notices', data);
+        const response = await axiosInstance.post('/api/notices', {
+          ...data,
+          userId: user?.userId,
+        });
         return response.data;
       },
     });
@@ -40,7 +46,10 @@ export const useNotice = () => {
   const useUpdateNotice = () => {
     return useMutation({
       mutationFn: async ({ noticeId, data }: { noticeId: number; data: CreateNoticeRequest }) => {
-        const response = await axiosInstance.patch(`/api/notices/${noticeId}`, data);
+        const response = await axiosInstance.patch(`/api/notices/${noticeId}`, {
+          ...data,
+          userId: user?.userId,
+        });
         return response.data;
       },
     });
@@ -50,7 +59,9 @@ export const useNotice = () => {
   const useDeleteNotice = () => {
     return useMutation({
       mutationFn: async (noticeId: number) => {
-        const response = await axiosInstance.delete(`/api/notices/${noticeId}`);
+        const response = await axiosInstance.delete(`/api/notices/${noticeId}`, {
+          data: { userId: user?.userId },
+        });
         return response.data;
       },
     });

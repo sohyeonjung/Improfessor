@@ -5,10 +5,12 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useProblem from "@/hooks/useProblem";
 import { useAlert } from "@/context/AlertContext";
+import { useUser } from "@/context/UserContext";
 
 export default function GeneratePage() {
   const router = useRouter();
   const { showAlert } = useAlert();
+  const { user, isAuthenticated } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const conceptFileRef = useRef<HTMLInputElement>(null);
   const formatFileRef = useRef<HTMLInputElement>(null);
@@ -41,6 +43,18 @@ export default function GeneratePage() {
   };
 
   const handleGenerate = async () => {
+    // 로그인 체크
+    if (!isAuthenticated) {
+      showAlert('로그인이 필요합니다.');
+      return;
+    }
+
+    // freeCount 체크
+    if (!user || user.freeCount <= 0) {
+      showAlert('무료 생성 횟수가 부족합니다. 마이페이지에서 확인해주세요.');
+      return;
+    }
+
     const conceptFiles = conceptFileRef.current?.files;
     if (!conceptFiles || conceptFiles.length === 0) {
       showAlert('수업 자료를 업로드해주세요.');

@@ -1,8 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
 import { GenerateProblemResponse, GenerateProblemRequest } from '@/types/problem';
+import { useUser } from '@/context/UserContext';
 
 export const useProblem = () => {
+  const { user } = useUser();
+
   // 문제 생성
   const useGenerateProblem = () => {
     return useMutation({
@@ -21,7 +24,7 @@ export const useProblem = () => {
           });
         }
 
-        const response = await axiosInstance.post('/api/problems', formData, {
+        const response = await axiosInstance.post(`/api/problems/${user?.userId}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
