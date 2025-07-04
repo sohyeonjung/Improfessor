@@ -74,18 +74,47 @@ export default function MyPage() {
   const displayNickname = nickname || user.nickname;
   const displayUniversity = university || user.university || "";
 
+  // 변경사항이 있는지 확인
+  const hasChanges = () => {
+    const nicknameChanged = nickname !== "" && nickname !== user.nickname;
+    const universityChanged = university !== "" && university !== (user.university || "");
+    const passwordChanged = password !== "";
+    
+    return nicknameChanged || universityChanged || passwordChanged;
+  };
+
   const handleUpdateUser = async () => {
     try {
-      await updateUser.mutateAsync({
-        id: parseInt(user.userId),
-        password: password || undefined,
-        university: displayUniversity || undefined,
-        major: user.major || undefined,
-        freeCount: user.freeCount,
-        recommendCount: user.recommendCount
-      });
+      const updateData: {
+        id?: number;
+        nickname?: string;
+        password?: string;
+        university?: string;
+        major?: string;
+      } = {
+        id: parseInt(user.userId)
+      };
+      
+      // 변경된 필드만 포함
+      if (nickname !== "" && nickname !== user.nickname) {
+        updateData.nickname = nickname;
+      }
+      if (university !== "" && university !== (user.university || "")) {
+        updateData.university = university;
+      }
+      if (password !== "") {
+        updateData.password = password;
+      }
+      if (user.major) {
+        updateData.major = user.major;
+      }
+
+      await updateUser.mutateAsync(updateData);
       showAlert("계정 정보가 수정되었습니다.");
       setPassword("");
+      // 수정 후 로컬 상태 초기화
+      setNickname("");
+      setUniversity("");
     } catch (error) {
       console.error('계정 수정 실패:', error);
       if (error instanceof AxiosError && error.response?.data) {
@@ -187,7 +216,7 @@ export default function MyPage() {
           <button
             type="button"
             onClick={handleUpdateUser}
-            disabled={updateUser.isPending}
+            disabled={updateUser.isPending || !hasChanges()}
             className="w-full bg-[#D9EAFD] text-black py-3 rounded hover:bg-[#BCCCDC] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {updateUser.isPending ? "수정 중..." : "수정하기"}

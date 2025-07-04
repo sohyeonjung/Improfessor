@@ -28,7 +28,8 @@ export interface LoginRequest {
 
 // 사용자 정보 수정 요청 타입
 export interface UpdateUserRequest {
-  id: number;
+  id?: number;
+  nickname?: string;
   password?: string;
   university?: string;
   major?: string;
