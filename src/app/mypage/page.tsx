@@ -1,15 +1,13 @@
 'use client';
 
 import Header from "@/components/Header";
-import useAuth from "@/hooks/useAuth";
+import { useUser } from "@/context/UserContext";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function MyPage() {
   const router = useRouter();
-  const { useUserInfo, useAuthStatus } = useAuth();
-  const { data: isAuthenticated } = useAuthStatus();
-  const { data: userInfoResponse, isLoading, error } = useUserInfo();
+  const { user, isLoading, error, isAuthenticated } = useUser();
 
   // 로컬 상태 (수정 가능한 필드들)
   const [nickname, setNickname] = useState("");
@@ -46,10 +44,8 @@ export default function MyPage() {
     );
   }
 
-  const userInfo = userInfoResponse?.data;
-
   // 사용자 정보가 없을 때
-  if (!userInfo) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-[#F8FAFC]">
         <Header />
@@ -61,8 +57,8 @@ export default function MyPage() {
   }
 
   // 사용자 정보가 로드되면 로컬 상태 업데이트
-  const displayNickname = nickname || userInfo.nickname;
-  const displayUniversity = university || userInfo.university || "";
+  const displayNickname = nickname || user.nickname;
+  const displayUniversity = university || user.university || "";
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -78,7 +74,7 @@ export default function MyPage() {
             <label className="block text-sm font-medium text-black mb-2">사용자 이메일</label>
             <input
               type="email"
-              value={userInfo.email}
+              value={user.email}
               disabled
               className="w-full px-4 py-2 bg-[#F8FAFC] text-black rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
             />
@@ -104,7 +100,7 @@ export default function MyPage() {
                 onChange={(e) => setUniversity(e.target.value)}
                 placeholder="대학교 검색"
                 className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
-              />
+            />
               <button
                 type="button"
                 className="px-4 py-2 bg-[#D9EAFD] text-black rounded hover:bg-[#BCCCDC] transition whitespace-nowrap"
@@ -114,7 +110,7 @@ export default function MyPage() {
             </div>
             <input
               type="text"
-              value={userInfo.major || ""}
+              value={user.major || ""}
               disabled
               className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
             />
@@ -140,7 +136,7 @@ export default function MyPage() {
           {/* 내 추천인 코드 */}
           <div className="bg-[#F8FAFC] p-4 rounded border border-[#BCCCDC]">
             <span className="text-black">내 추천인 코드 :</span>
-            <span className="ml-2 font-mono font-bold text-lg text-black">{userInfo.referralCode}</span>
+            <span className="ml-2 font-mono font-bold text-lg text-black">{user.referralCode}</span>
           </div>
 
           {/* 추천인 코드 입력 */}
@@ -152,7 +148,7 @@ export default function MyPage() {
                 value={inputReferral}
                 onChange={(e) => setInputReferral(e.target.value.toUpperCase())}
                 placeholder="추천인 코드"
-                className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
               />
               <button
                 type="button"

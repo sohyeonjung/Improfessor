@@ -1,6 +1,6 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
-import { getUserIdFromToken } from '@/lib/utils';
+import { getUserIdFromToken, decodeToken } from '@/lib/utils';
 import {
   SendVerificationEmailRequest,
   VerifyEmailRequest,
@@ -12,6 +12,8 @@ import {
 } from '@/types/auth';
 
 const useAuth = () => {
+  const queryClient = useQueryClient();
+
   // 이메일 인증코드 전송
   const useSendVerificationEmail = () => {
     return useMutation<ApiResponse<null>, Error, SendVerificationEmailRequest>({
@@ -50,13 +52,26 @@ const useAuth = () => {
         const response = await axiosInstance.post('/api/users/login', data);
         return response.data;
       },
-      onSuccess: (response) => {
+      onSuccess: async (response) => {
         // 토큰 저장
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         
         // Authorization 헤더 설정
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+        
+        // 사용자 ID 추출
+        const userId = getUserIdFromToken();
+        if (userId) {
+          // 바로 사용자 정보 가져오기
+          try {
+            const userResponse = await axiosInstance.get(`/api/users/${userId}`);
+            // 사용자 정보를 캐시에 저장
+            queryClient.setQueryData(['userInfo', userId], userResponse.data);
+          } catch (error) {
+            console.error('사용자 정보 가져오기 실패:', error);
+          }
+        }
       },
     });
   };
@@ -75,24 +90,49 @@ const useAuth = () => {
         
         // Authorization 헤더 제거
         delete axiosInstance.defaults.headers.common['Authorization'];
+        
+        // 사용자 정보 캐시 제거
+        queryClient.removeQueries({ queryKey: ['userInfo'] });
       },
     });
   };
 
-  // 인증 상태 확인
+  // 인증 상태 확인 (토큰 존재 여부 + 만료 시간 확인)
   const useAuthStatus = () => {
     return useQuery({
       queryKey: ['authStatus'],
       queryFn: () => {
         const accessToken = localStorage.getItem('accessToken');
-        return !!accessToken;
+        if (!accessToken) {
+          return false;
+        }
+        
+        // 토큰 디코딩해서 만료 시간 확인
+        const decoded = decodeToken(accessToken);
+        if (!decoded || !decoded.exp) {
+          return false;
+        }
+        
+        // 현재 시간과 만료 시간 비교
+        const currentTime = Math.floor(Date.now() / 1000);
+        const isExpired = decoded.exp < currentTime;
+        
+        if (isExpired) {
+          // 만료된 토큰 제거
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          delete axiosInstance.defaults.headers.common['Authorization'];
+          return false;
+        }
+        
+        return true;
       },
-      staleTime: Infinity,
+      staleTime: 60 * 1000, // 1분마다 체크
       gcTime: Infinity,
     });
   };
 
-  // 사용자 정보 가져오기
+  // 사용자 정보 가져오기 (기존 훅 유지 - 하위 호환성)
   const useUserInfo = () => {
     return useQuery<ApiResponse<UserInfo>>({
       queryKey: ['userInfo'],

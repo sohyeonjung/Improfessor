@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useAuth from '@/hooks/useAuth';
+import { useUser } from '@/context/UserContext';
 
 export default function Header() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
-  const { useLogout, useAuthStatus } = useAuth();
+  const { useLogout } = useAuth();
   const logoutMutation = useLogout();
-  const { data: isAuthenticated } = useAuthStatus();
+  const { user, isLoading: userLoading, isAuthenticated } = useUser();
 
   // 초기 토큰 설정
   useEffect(() => {
@@ -74,24 +75,39 @@ export default function Header() {
                   className="flex items-center text-black hover:text-[#BCCCDC] transition-colors"
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                 >
-                  <svg
-                    className="w-6 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
+                  <div className="flex items-center space-x-2">
+                    {user ? (
+                      <span className="text-sm font-medium">{user.nickname}</span>
+                    ) : userLoading ? (
+                      <span className="text-sm text-gray-500">로딩 중...</span>
+                    ) : (
+                      <span className="text-sm font-medium">사용자</span>
+                    )}
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                  </div>
                 </button>
 
                 {/* 드롭다운 메뉴 */}
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 border border-[#BCCCDC]">
+                    {user && (
+                      <div className="px-4 py-2 text-xs text-gray-500 border-b border-[#BCCCDC]">
+                        <div className="font-medium">{user.email}</div>
+                        <div>무료 생성: {user.freeCount}회</div>
+                      </div>
+                    )}
                     <Link
                       href="/mypage"
                       className="block px-4 py-2 text-sm text-black hover:bg-[#D9EAFD]"

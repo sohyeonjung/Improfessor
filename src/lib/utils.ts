@@ -16,7 +16,7 @@ export const decodeToken = (token: string) => {
   }
 };
 
-// localStorage에서 userId 가져오기
+// localStorage에서 userId 가져오기 (aud 필드 사용)
 export const getUserIdFromToken = (): string | null => {
   if (typeof window === 'undefined') return null;
   
@@ -24,5 +24,6 @@ export const getUserIdFromToken = (): string | null => {
   if (!accessToken) return null;
   
   const decoded = decodeToken(accessToken);
-  return decoded?.userId || decoded?.sub || null;
+  // aud 필드가 사용자 ID
+  return decoded?.aud || null;
 }; 

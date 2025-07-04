@@ -1,11 +1,10 @@
 'use client';
 
 import Link from "next/link";
-import useAuth from "@/hooks/useAuth";
+import { useUser } from "@/context/UserContext";
 
 export default function Home() {
-  const { useAuthStatus } = useAuth();
-  const { data: isAuthenticated } = useAuthStatus();
+  const { isAuthenticated } = useUser();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#D9EAFD] to-[#F8FAFC] relative">
