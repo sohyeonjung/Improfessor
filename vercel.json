@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "app/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "build": {
+    "env": {
+      "GIT_LFS_ENABLED": "true"
+    }
+  }
+} 
