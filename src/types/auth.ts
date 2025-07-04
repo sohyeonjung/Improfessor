@@ -26,6 +26,16 @@ export interface LoginRequest {
   password: string;
 }
 
+// 사용자 정보 수정 요청 타입
+export interface UpdateUserRequest {
+  id: number;
+  password?: string;
+  university?: string;
+  major?: string;
+  freeCount?: number;
+  recommendCount?: number;
+}
+
 export interface TokenData {
   grantType: string;
   accessToken: string;

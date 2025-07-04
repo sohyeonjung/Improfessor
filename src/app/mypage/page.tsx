@@ -2,21 +2,35 @@
 
 import Header from "@/components/Header";
 import { useUser } from "@/context/UserContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import useAuth from "@/hooks/useAuth";
+import { useAlert } from "@/context/AlertContext";
+import { AxiosError } from "axios";
+import { ApiResponse } from "@/types/auth";
 
 export default function MyPage() {
   const router = useRouter();
   const { user, isLoading, error, isAuthenticated } = useUser();
+  const { useUpdateUser, useDeleteUser } = useAuth();
+  const updateUser = useUpdateUser();
+  const deleteUser = useDeleteUser();
+  const { showAlert, showConfirm } = useAlert();
 
   // 로컬 상태 (수정 가능한 필드들)
   const [nickname, setNickname] = useState("");
   const [university, setUniversity] = useState("");
   const [inputReferral, setInputReferral] = useState("");
+  const [password, setPassword] = useState("");
 
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, router]);
+
   if (!isAuthenticated) {
-    router.push('/login');
     return null;
   }
 
@@ -60,6 +74,47 @@ export default function MyPage() {
   const displayNickname = nickname || user.nickname;
   const displayUniversity = university || user.university || "";
 
+  const handleUpdateUser = async () => {
+    try {
+      await updateUser.mutateAsync({
+        id: parseInt(user.userId),
+        password: password || undefined,
+        university: displayUniversity || undefined,
+        major: user.major || undefined,
+        freeCount: user.freeCount,
+        recommendCount: user.recommendCount
+      });
+      showAlert("계정 정보가 수정되었습니다.");
+      setPassword("");
+    } catch (error) {
+      console.error('계정 수정 실패:', error);
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorResponse = error.response.data as ApiResponse<null>;
+        showAlert(errorResponse.message);
+      } else {
+        showAlert("계정 수정에 실패했습니다. 다시 시도해주세요.");
+      }
+    }
+  };
+
+  const handleDeleteUser = () => {
+    showConfirm("정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.", async () => {
+      try {
+        await deleteUser.mutateAsync(user.userId);
+        showAlert("계정이 삭제되었습니다.");
+        router.push("/");
+      } catch (error) {
+        console.error('계정 탈퇴 실패:', error);
+        if (error instanceof AxiosError && error.response?.data) {
+          const errorResponse = error.response.data as ApiResponse<null>;
+          showAlert(errorResponse.message);
+        } else {
+          showAlert("계정 탈퇴에 실패했습니다. 다시 시도해주세요.");
+        }
+      }
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
@@ -91,6 +146,18 @@ export default function MyPage() {
             />
           </div>
 
+          {/* 비밀번호 변경 */}
+          <div>
+            <label className="block text-sm font-medium text-black mb-2">새 비밀번호 (선택)</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
+              placeholder="변경하려면 입력하세요"
+            />
+          </div>
+
           {/* 대학교 + 학과 */}
           <div className="space-y-4">
             <div className="flex gap-2">
@@ -119,9 +186,11 @@ export default function MyPage() {
           {/* 수정하기 버튼 */}
           <button
             type="button"
-            className="w-full bg-[#D9EAFD] text-black py-3 rounded hover:bg-[#BCCCDC] transition"
+            onClick={handleUpdateUser}
+            disabled={updateUser.isPending}
+            className="w-full bg-[#D9EAFD] text-black py-3 rounded hover:bg-[#BCCCDC] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            수정하기
+            {updateUser.isPending ? "수정 중..." : "수정하기"}
           </button>
         </div>
 
@@ -164,9 +233,11 @@ export default function MyPage() {
         {/* 계정 탈퇴 */}
         <button
           type="button"
-          className="w-full bg-[#BCCCDC] text-black py-3 rounded mt-12 hover:bg-[#D9EAFD] transition"
+          onClick={handleDeleteUser}
+          disabled={deleteUser.isPending}
+          className="w-full bg-[#BCCCDC] text-black py-3 rounded mt-12 hover:bg-[#D9EAFD] transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          계정탈퇴
+          {deleteUser.isPending ? "처리 중..." : "계정탈퇴"}
         </button>
       </main>
     </div>

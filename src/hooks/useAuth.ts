@@ -6,6 +6,7 @@ import {
   VerifyEmailRequest,
   RegisterRequest,
   LoginRequest,
+  UpdateUserRequest,
   ApiResponse,
   TokenData,
   UserInfo
@@ -154,6 +155,48 @@ const useAuth = () => {
     });
   };
 
+  // 사용자 정보 수정
+  const useUpdateUser = () => {
+    return useMutation<ApiResponse<null>, Error, UpdateUserRequest>({
+      mutationFn: async (data) => {
+        const response = await axiosInstance.patch('/api/users/me', data);
+        return response.data;
+      },
+      onSuccess: () => {
+        // 사용자 정보 캐시 무효화하여 다시 가져오기
+        const userId = getUserIdFromToken();
+        if (userId) {
+          queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+          queryClient.invalidateQueries({ queryKey: ['userInfo'] });
+        }
+      },
+    });
+  };
+
+  // 계정 탈퇴
+  const useDeleteUser = () => {
+    return useMutation<ApiResponse<null>, Error, string>({
+      mutationFn: async (userId) => {
+        const response = await axiosInstance.delete(`/api/users/${userId}`);
+        return response.data;
+      },
+      onSuccess: () => {
+        // 토큰 제거
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        
+        // Authorization 헤더 제거
+        delete axiosInstance.defaults.headers.common['Authorization'];
+        
+        // 토큰 변경 이벤트 발생
+        window.dispatchEvent(new Event('tokenChange'));
+        
+        // 사용자 정보 캐시 제거
+        queryClient.removeQueries({ queryKey: ['userInfo'] });
+      },
+    });
+  };
+
   return {
     useSendVerificationEmail,
     useVerifyEmail,
@@ -162,6 +205,8 @@ const useAuth = () => {
     useLogout,
     useAuthStatus,
     useUserInfo,
+    useUpdateUser,
+    useDeleteUser,
   };
 };
 
