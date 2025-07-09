@@ -264,7 +264,7 @@ export default function MyPage() {
               <input
                 type="text"
                 value={inputReferral}
-                onChange={(e) => setInputReferral(e.target.value.toUpperCase())}
+                onChange={(e) => setInputReferral(e.target.value)}
                 placeholder="추천인 코드"
                 className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
               />
