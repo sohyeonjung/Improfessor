@@ -158,7 +158,7 @@ export default function GeneratePage() {
                     {conceptFileName || '파일 선택하기'}
                   </span>
                   <span className="text-xs text-black">
-                    (pdf, ppt 파일만 가능)
+                    (pdf, ppt 파일만 가능, 각 15MB 이하)
                   </span>
                 </label>
               </div>
@@ -227,7 +227,7 @@ export default function GeneratePage() {
                     {formatFileName || '파일 선택하기'}
                   </span>
                   <span className="text-xs text-black">
-                    (pdf, ppt 파일만 가능)
+                    (pdf, ppt 파일만 가능, 각 15MB 이하)
                   </span>
                 </label>
               </div>
