@@ -13,16 +13,14 @@ export default function ResultPage() {
   
   const [isLoading, setIsLoading] = useState(false);
   const [problems, setProblems] = useState<Problem[]>([]);
-  const [downloadKey, setDownloadKey] = useState<string>('');
 
   useEffect(() => {
     // URL에서 상태 복원
     const state = searchParams.get('state');
     if (state) {
       try {
-        const { problems, downloadKey } = JSON.parse(state);
+        const { problems } = JSON.parse(state);
         setProblems(problems);
-        setDownloadKey(downloadKey);
       } catch (error) {
         console.error('상태 복원 실패:', error);
         router.push('/generate');
@@ -33,11 +31,11 @@ export default function ResultPage() {
   }, [searchParams, router]);
 
   const handleDownload = async () => {
-    if (!downloadKey) return;
+    if (!problems.length) return;
 
     setIsLoading(true);
     try {
-      await downloadProblemPDF(downloadKey);
+      await downloadProblemPDF(problems);
     } catch (error) {
       alert(`PDF 다운로드에 실패했습니다: ${error instanceof Error ? error.message : '알 수 없는 오류'}`);
     } finally {
@@ -58,7 +56,7 @@ export default function ResultPage() {
               </h1>
               <button
                 onClick={handleDownload}
-                disabled={isLoading || !downloadKey}
+                disabled={isLoading || !problems.length}
                 className={`px-4 py-2 rounded-md transition-colors ${
                   isLoading
                     ? 'bg-gray-300 cursor-not-allowed'
