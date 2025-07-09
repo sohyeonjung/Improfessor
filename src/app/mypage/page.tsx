@@ -18,7 +18,6 @@ export default function MyPage() {
   const { showAlert, showConfirm } = useAlert();
 
   // 로컬 상태 (수정 가능한 필드들)
-  const [nickname, setNickname] = useState("");
   const [university, setUniversity] = useState("");
   const [inputReferral, setInputReferral] = useState("");
   const [password, setPassword] = useState("");
@@ -71,34 +70,29 @@ export default function MyPage() {
   }
 
   // 사용자 정보가 로드되면 로컬 상태 업데이트
-  const displayNickname = nickname || user.nickname;
   const displayUniversity = university || user.university || "";
 
   // 변경사항이 있는지 확인
   const hasChanges = () => {
-    const nicknameChanged = nickname !== "" && nickname !== user.nickname;
     const universityChanged = university !== "" && university !== (user.university || "");
     const passwordChanged = password !== "";
     
-    return nicknameChanged || universityChanged || passwordChanged;
+    return universityChanged || passwordChanged;
   };
 
   const handleUpdateUser = async () => {
     try {
       const updateData: {
-        id?: number;
-        nickname?: string;
+        id: number;
         password?: string;
         university?: string;
         major?: string;
+        recommendNickname?: string;
       } = {
         id: parseInt(user.userId)
       };
       
       // 변경된 필드만 포함
-      if (nickname !== "" && nickname !== user.nickname) {
-        updateData.nickname = nickname;
-      }
       if (university !== "" && university !== (user.university || "")) {
         updateData.university = university;
       }
@@ -113,7 +107,6 @@ export default function MyPage() {
       showAlert("계정 정보가 수정되었습니다.");
       setPassword("");
       // 수정 후 로컬 상태 초기화
-      setNickname("");
       setUniversity("");
     } catch (error) {
       console.error('계정 수정 실패:', error);
@@ -144,6 +137,32 @@ export default function MyPage() {
     });
   };
 
+  const handleReferralSubmit = async () => {
+    if (!inputReferral.trim()) {
+      showAlert("추천인 코드를 입력해주세요.");
+      return;
+    }
+
+    try {
+      const updateData = {
+        id: parseInt(user.userId),
+        recommendNickname: inputReferral.trim()
+      };
+
+      await updateUser.mutateAsync(updateData);
+      showAlert("추천인 코드가 입력되었습니다. 문제 생성 횟수가 1회 추가됩니다.");
+      setInputReferral("");
+    } catch (error) {
+      console.error('추천인 코드 입력 실패:', error);
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorResponse = error.response.data as ApiResponse<null>;
+        showAlert(errorResponse.message);
+      } else {
+        showAlert("추천인 코드 입력에 실패했습니다. 다시 시도해주세요.");
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       <Header />
@@ -169,9 +188,9 @@ export default function MyPage() {
             <label className="block text-sm font-medium text-black mb-2">사용자 닉네임</label>
             <input
               type="text"
-              value={displayNickname}
-              onChange={(e) => setNickname(e.target.value)}
-              className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
+              value={user.nickname}
+              disabled
+              className="w-full px-4 py-2 bg-[#F8FAFC] text-black rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
             />
           </div>
 
@@ -235,7 +254,7 @@ export default function MyPage() {
           {/* 내 추천인 코드 */}
           <div className="bg-[#F8FAFC] p-4 rounded border border-[#BCCCDC]">
             <span className="text-black">내 추천인 코드 :</span>
-            <span className="ml-2 font-mono font-bold text-lg text-black">{user.referralCode}</span>
+            <span className="ml-2 font-mono font-bold text-lg text-black">{user.nickname}</span>
           </div>
 
           {/* 추천인 코드 입력 */}
@@ -251,9 +270,11 @@ export default function MyPage() {
               />
               <button
                 type="button"
-                className="px-4 py-2 bg-[#D9EAFD] text-black rounded hover:bg-[#BCCCDC] transition whitespace-nowrap"
+                onClick={handleReferralSubmit}
+                disabled={updateUser.isPending || !inputReferral.trim()}
+                className="px-4 py-2 bg-[#D9EAFD] text-black rounded hover:bg-[#BCCCDC] transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                입력
+                {updateUser.isPending ? "처리 중..." : "입력"}
               </button>
             </div>
             <p className="text-xs text-black">문제 생성 횟수가 1회 추가됩니다. (1회만 가능)</p>
