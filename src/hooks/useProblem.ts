@@ -3,6 +3,7 @@ import { axiosInstance } from '@/lib/axios';
 import { GenerateProblemResponse, GenerateProblemRequest, Problem } from '@/types/problem';
 import { useUser } from '@/context/UserContext';
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export const useProblem = () => {
   const { user } = useUser();
@@ -61,78 +62,92 @@ export const useProblem = () => {
   // 클라이언트 사이드 PDF 생성 및 다운로드
   const downloadProblemPDF = async (problems: Problem[]) => {
     try {
-      const doc = new jsPDF();
-      let yPosition = 20;
-      const pageHeight = doc.internal.pageSize.height;
-      const margin = 20;
-      const lineHeight = 7;
-      const titleHeight = 10;
-
-      // 제목 추가
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text('생성된 문제', margin, yPosition);
-      yPosition += titleHeight + 10;
+      // 임시 HTML 요소 생성
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '0';
+      tempDiv.style.width = '800px';
+      tempDiv.style.padding = '40px';
+      tempDiv.style.backgroundColor = 'white';
+      tempDiv.style.fontFamily = 'Arial, sans-serif';
+      tempDiv.style.fontSize = '14px';
+      tempDiv.style.lineHeight = '1.6';
+      
+      // HTML 내용 생성
+      let htmlContent = `
+        <div style="margin-bottom: 30px;">
+          <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #333;">
+            생성된 문제
+          </h1>
+        </div>
+      `;
 
       problems.forEach((problem) => {
-        // 페이지 넘침 체크
-        if (yPosition > pageHeight - 60) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        // 문제 번호
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`문제 ${problem.number}`, margin, yPosition);
-        yPosition += titleHeight;
-
-        // 문제 내용
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'normal');
-        const contentLines = doc.splitTextToSize(`문제 내용: ${problem.content}`, 170);
-        contentLines.forEach((line: string) => {
-          if (yPosition > pageHeight - 40) {
-            doc.addPage();
-            yPosition = 20;
-          }
-          doc.text(line, margin, yPosition);
-          yPosition += lineHeight;
-        });
-
-        // 설명이 있는 경우
-        if (problem.description) {
-          yPosition += 5;
-          const descLines = doc.splitTextToSize(`설명: ${problem.description}`, 170);
-          descLines.forEach((line: string) => {
-            if (yPosition > pageHeight - 40) {
-              doc.addPage();
-              yPosition = 20;
-            }
-            doc.text(line, margin, yPosition);
-            yPosition += lineHeight;
-          });
-        }
-
-        // 정답
-        yPosition += 5;
-        const answerLines = doc.splitTextToSize(`정답: ${problem.answer}`, 170);
-        answerLines.forEach((line: string) => {
-          if (yPosition > pageHeight - 40) {
-            doc.addPage();
-            yPosition = 20;
-          }
-          doc.text(line, margin, yPosition);
-          yPosition += lineHeight;
-        });
-
-        // 문제 간 간격
-        yPosition += 15;
+        htmlContent += `
+          <div style="margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+            <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #333;">
+              문제 ${problem.number}
+            </h3>
+            
+            <div style="margin-bottom: 15px;">
+              <h4 style="font-weight: bold; margin-bottom: 8px; color: #555;">문제 내용</h4>
+              <p style="color: #333; white-space: pre-wrap;">${problem.content}</p>
+            </div>
+            
+            ${problem.description ? `
+              <div style="margin-bottom: 15px;">
+                <h4 style="font-weight: bold; margin-bottom: 8px; color: #555;">설명</h4>
+                <p style="color: #333; white-space: pre-wrap;">${problem.description}</p>
+              </div>
+            ` : ''}
+            
+            <div>
+              <h4 style="font-weight: bold; margin-bottom: 8px; color: #555;">정답</h4>
+              <p style="color: #333; white-space: pre-wrap;">${problem.answer}</p>
+            </div>
+          </div>
+        `;
       });
+
+      tempDiv.innerHTML = htmlContent;
+      document.body.appendChild(tempDiv);
+
+      // HTML을 캔버스로 변환
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+
+      // 캔버스를 PDF로 변환
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const imgWidth = 210; // A4 너비
+      const pageHeight = 295; // A4 높이
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // 임시 요소 제거
+      document.body.removeChild(tempDiv);
 
       // PDF 다운로드
       const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-      doc.save(`problems_${timestamp}.pdf`);
+      pdf.save(`problems_${timestamp}.pdf`);
     } catch (error) {
       console.error('PDF 생성 실패:', error);
       throw error;
