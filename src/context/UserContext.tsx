@@ -38,8 +38,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       const token = localStorage.getItem('accessToken');
       if (token) {
         const extractedUserId = getUserIdFromToken();
+        // 토큰이 있으면 userId를 설정 (디코딩 실패해도 null로 설정)
         setUserId(extractedUserId);
       } else {
+        // 토큰이 없는 경우에만 userId를 null로 설정
         setUserId(null);
         queryClient.removeQueries({ queryKey: ['userInfo'] });
       }
@@ -88,8 +90,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     retry: 1,
   });
 
-  // isAuthenticated: 사용자 정보가 성공적으로 로드되었는지 확인
-  const isAuthenticated = !!userInfoResponse?.data;
+  // isAuthenticated: 토큰이 있으면 인증된 것으로 간주
+  const isAuthenticated = !!userId;
 
   const value: UserContextType = {
     user: userInfoResponse?.data || null,
