@@ -228,7 +228,8 @@ export default function MyPage() {
           <h2 className="text-xl font-semibold text-black">프로모션</h2>
           <p className="text-black">
             친구를 추천하여 최대 99회의 무료 생성 횟수를 받으세요!<br />
-            친구가 내 추천인 코드를 입력할 때마다 친구와 나 모두 3회의 무료 생성 횟수를 받습니다.
+            친구가 내 추천인 코드를 입력하면 친구는 1회, 나는 3회의 무료 생성 횟수를 받습니다.<br />
+            추천인 코드 입력은 1회만 가능하고, 추천받는 것은 최대 33회까지 가능합니다.
           </p>
 
           {/* 내 추천인 코드 */}
@@ -255,7 +256,7 @@ export default function MyPage() {
                 입력
               </button>
             </div>
-            <p className="text-xs text-black">문제 생성 횟수가 3회 추가됩니다.</p>
+            <p className="text-xs text-black">문제 생성 횟수가 1회 추가됩니다. (1회만 가능)</p>
           </div>
         </div>
 
