@@ -30,6 +30,29 @@ export default function SignupPage() {
   const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [timer, setTimer] = useState<number | null>(null);
   const [canResend, setCanResend] = useState(true);
+  const [passwordValidation, setPasswordValidation] = useState({
+    isValid: false,
+    hasMinLength: false,
+    hasLetter: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
+
+  // 비밀번호 정규식 검증 함수
+  const validatePassword = (password: string) => {
+    const minLength = password.length >= 8;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    return {
+      isValid: minLength && hasLetter && hasNumber && hasSpecialChar,
+      hasMinLength: minLength,
+      hasLetter,
+      hasNumber,
+      hasSpecialChar,
+    };
+  };
 
   useEffect(() => {
     if (timer === null) return;
@@ -53,6 +76,11 @@ export default function SignupPage() {
       ...prev,
       [id]: value
     }));
+
+    // 비밀번호 입력 시 실시간 검증
+    if (id === 'password') {
+      setPasswordValidation(validatePassword(value));
+    }
   };
 
   const handleSendVerification = async () => {
@@ -111,6 +139,11 @@ export default function SignupPage() {
 
     if (!isEmailVerified) {
       showAlert("이메일 인증을 완료해주세요.");
+      return;
+    }
+
+    if (!passwordValidation.isValid) {
+      showAlert("비밀번호 조건을 만족하지 않습니다.");
       return;
     }
 
@@ -255,10 +288,32 @@ export default function SignupPage() {
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+                className={`w-full px-4 py-2 bg-white border rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50 ${
+                  formData.password ? (passwordValidation.isValid ? 'border-green-500' : 'border-red-500') : 'border-[#BCCCDC]'
+                }`}
                 placeholder="비밀번호를 입력해주세요"
                 required
               />
+              {formData.password && (
+                <div className="mt-2 space-y-1">
+                  <div className={`text-xs flex items-center gap-1 ${passwordValidation.hasMinLength ? 'text-green-600' : 'text-red-600'}`}>
+                    <span>{passwordValidation.hasMinLength ? '✓' : '✗'}</span>
+                    최소 8자 이상
+                  </div>
+                  <div className={`text-xs flex items-center gap-1 ${passwordValidation.hasLetter ? 'text-green-600' : 'text-red-600'}`}>
+                    <span>{passwordValidation.hasLetter ? '✓' : '✗'}</span>
+                    영문 포함
+                  </div>
+                  <div className={`text-xs flex items-center gap-1 ${passwordValidation.hasNumber ? 'text-green-600' : 'text-red-600'}`}>
+                    <span>{passwordValidation.hasNumber ? '✓' : '✗'}</span>
+                    숫자 포함
+                  </div>
+                  <div className={`text-xs flex items-center gap-1 ${passwordValidation.hasSpecialChar ? 'text-green-600' : 'text-red-600'}`}>
+                    <span>{passwordValidation.hasSpecialChar ? '✓' : '✗'}</span>
+                    특수문자 포함 (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
