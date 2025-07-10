@@ -94,11 +94,12 @@ const useAuth = () => {
         // Authorization 헤더 제거
         delete axiosInstance.defaults.headers.common['Authorization'];
         
-        // 토큰 변경 이벤트 발생
-        window.dispatchEvent(new Event('tokenChange'));
-        
-        // 사용자 정보 캐시 제거
+        // 사용자 정보 캐시 완전 제거
         queryClient.removeQueries({ queryKey: ['userInfo'] });
+        queryClient.removeQueries({ queryKey: ['userInfo', null] });
+        
+        // 토큰 변경 이벤트 발생 (UserContext에서 상태 업데이트)
+        window.dispatchEvent(new Event('tokenChange'));
       },
     });
   };

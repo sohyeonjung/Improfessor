@@ -41,9 +41,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         // 토큰이 있으면 userId를 설정 (디코딩 실패해도 null로 설정)
         setUserId(extractedUserId);
       } else {
-        // 토큰이 없는 경우에만 userId를 null로 설정
+        // 토큰이 없는 경우 userId를 null로 설정하고 사용자 정보 캐시 제거
         setUserId(null);
         queryClient.removeQueries({ queryKey: ['userInfo'] });
+        queryClient.removeQueries({ queryKey: ['userInfo', null] });
       }
     };
 
