@@ -4,7 +4,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 
 interface AlertContextType {
   showAlert: (message: string) => void;
-  showConfirm: (message: string, onConfirm: () => void) => void;
+  showConfirm: (title: string, description: string, onConfirm: () => void) => void;
 }
 
 const AlertContext = createContext<AlertContextType | null>(null);
@@ -13,7 +13,8 @@ export function AlertProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [message, setMessage] = useState('');
-  const [confirmMessage, setConfirmMessage] = useState('');
+  const [confirmTitle, setConfirmTitle] = useState('');
+  const [confirmDescription, setConfirmDescription] = useState('');
   const [onConfirm, setOnConfirm] = useState<(() => void) | null>(null);
 
   const showAlert = (message: string) => {
@@ -21,8 +22,9 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     setIsOpen(true);
   };
 
-  const showConfirm = (message: string, confirmCallback: () => void) => {
-    setConfirmMessage(message);
+  const showConfirm = (title: string, description: string, confirmCallback: () => void) => {
+    setConfirmTitle(title);
+    setConfirmDescription(description);
     setOnConfirm(() => confirmCallback);
     setIsConfirmOpen(true);
   };
@@ -53,7 +55,8 @@ export function AlertProvider({ children }: { children: ReactNode }) {
       />
       <ConfirmModal
         isOpen={isConfirmOpen}
-        message={confirmMessage}
+        title={confirmTitle}
+        description={confirmDescription}
         onConfirm={handleConfirm}
         onCancel={handleConfirmClose}
       />

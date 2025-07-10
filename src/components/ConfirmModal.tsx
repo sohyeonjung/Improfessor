@@ -3,12 +3,13 @@ import { createPortal } from 'react-dom';
 
 interface ConfirmModalProps {
   isOpen: boolean;
-  message: string;
+  title: string;
+  description?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-export default function ConfirmModal({ isOpen, message, onConfirm, onCancel }: ConfirmModalProps) {
+export default function ConfirmModal({ isOpen, title, description, onConfirm, onCancel }: ConfirmModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -30,9 +31,10 @@ export default function ConfirmModal({ isOpen, message, onConfirm, onCancel }: C
       />
       <div className="relative bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4 transform transition-all">
         <div className="text-center">
-          <p className="text-lg text-gray-800 font-medium mb-6">
-            {message}
-          </p>
+          <div className="mb-2 text-xl font-bold text-gray-900">{title}</div>
+          {description && (
+            <div className="mb-6 text-gray-700 whitespace-pre-line text-base">{description}</div>
+          )}
           <div className="flex gap-3">
             <button
               onClick={onCancel}

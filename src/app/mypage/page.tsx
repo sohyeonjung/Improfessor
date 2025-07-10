@@ -120,7 +120,10 @@ export default function MyPage() {
   };
 
   const handleDeleteUser = () => {
-    showConfirm("정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.", async () => {
+    showConfirm(
+      '계정을 삭제하시겠습니까?',
+      '현재 해당 서비스는 초기 베타 버전으로 올해 10월 정식 서비스 런칭이 예정되어 있습니다.\n\n모든 데이터는 계정 삭제 후 30일 안에 영구적으로 삭제됩니다.',
+      async () => {
       try {
         await deleteUser.mutateAsync(user.userId);
         showAlert("계정이 삭제되었습니다.");
@@ -247,7 +250,7 @@ export default function MyPage() {
           <h2 className="text-xl font-semibold text-black">프로모션</h2>
           <p className="text-black">
             친구를 추천하여 최대 99회의 무료 생성 횟수를 받으세요!<br />
-            친구가 내 추천인 코드를 입력하면 친구는 1회, 나는 3회의 무료 생성 횟수를 받습니다.<br />
+            친구가 내 추천인 코드를 입력하면 친구는 3회, 나는 3회의 무료 생성 횟수를 받습니다.<br />
             추천인 코드 입력은 1회만 가능하고, 추천받는 것은 최대 33회까지 가능합니다.
           </p>
 
