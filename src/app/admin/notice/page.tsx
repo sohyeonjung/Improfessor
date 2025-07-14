@@ -47,7 +47,7 @@ export default function AdminNoticePage() {
   };
 
   const handleDeleteClick = (noticeId: number) => {
-    showConfirm('정말로 이 공지사항을 삭제하시겠습니까?', async () => {
+    showConfirm('공지사항 삭제', '정말로 이 공지사항을 삭제하시겠습니까?', async () => {
       try {
         await deleteNoticeMutation.mutateAsync(noticeId);
         queryClient.invalidateQueries({ queryKey: ['notices'] });
