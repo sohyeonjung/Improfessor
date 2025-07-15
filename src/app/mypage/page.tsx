@@ -69,9 +69,9 @@ export default function MyPage() {
     );
   }
 
-  // 사용자 정보가 로드되면 로컬 상태 업데이트
-  const displayUniversity = university || user.university || "";
-  const displayMajor = major || user.major || "";
+  // 사용자 정보가 로드되면 로컬 상태 업데이트 (초기화 시에만)
+  const displayUniversity = university !== "" ? university : (user.university || "");
+  const displayMajor = major !== "" ? major : (user.major || "");
 
   // 변경사항이 있는지 확인
   const hasChanges = () => {
@@ -92,12 +92,18 @@ export default function MyPage() {
         id: parseInt(user.userId)
       };
       
-      // 변경된 필드만 포함
-      if (university !== "" && university !== (user.university || "")) {
+      // 대학교 처리: 수정된 값이 있으면 수정값, 없으면 기존값 유지
+      if (university !== "") {
         updateData.university = university;
+      } else if (user.university) {
+        updateData.university = user.university;
       }
-      if (major !== "" && major !== (user.major || "")) {
+      
+      // 학과 처리: 수정된 값이 있으면 수정값, 없으면 기존값 유지
+      if (major !== "") {
         updateData.major = major;
+      } else if (user.major) {
+        updateData.major = user.major;
       }
 
       await updateUser.mutateAsync(updateData);
