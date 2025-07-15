@@ -16,6 +16,7 @@ export interface RegisterRequest {
   password: string;
   university?: string;
   major?: string;
+  recommendNickname?: string;
   freeCount: number;
   recommendCount: number;
 }
@@ -33,6 +34,7 @@ export interface UpdateUserRequest {
   password?: string;
   university?: string;
   major?: string;
+  recommendNickname?: string;
   freeCount?: number;
   recommendCount?: number;
 }

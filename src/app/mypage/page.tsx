@@ -19,8 +19,8 @@ export default function MyPage() {
 
   // 로컬 상태 (수정 가능한 필드들)
   const [university, setUniversity] = useState("");
+  const [major, setMajor] = useState("");
   const [inputReferral, setInputReferral] = useState("");
-  const [password, setPassword] = useState("");
 
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트
   useEffect(() => {
@@ -71,20 +71,20 @@ export default function MyPage() {
 
   // 사용자 정보가 로드되면 로컬 상태 업데이트
   const displayUniversity = university || user.university || "";
+  const displayMajor = major || user.major || "";
 
   // 변경사항이 있는지 확인
   const hasChanges = () => {
     const universityChanged = university !== "" && university !== (user.university || "");
-    const passwordChanged = password !== "";
+    const majorChanged = major !== "" && major !== (user.major || "");
     
-    return universityChanged || passwordChanged;
+    return universityChanged || majorChanged;
   };
 
   const handleUpdateUser = async () => {
     try {
       const updateData: {
         id: number;
-        password?: string;
         university?: string;
         major?: string;
         recommendNickname?: string;
@@ -96,18 +96,15 @@ export default function MyPage() {
       if (university !== "" && university !== (user.university || "")) {
         updateData.university = university;
       }
-      if (password !== "") {
-        updateData.password = password;
-      }
-      if (user.major) {
-        updateData.major = user.major;
+      if (major !== "" && major !== (user.major || "")) {
+        updateData.major = major;
       }
 
       await updateUser.mutateAsync(updateData);
       showAlert("계정 정보가 수정되었습니다.");
-      setPassword("");
       // 수정 후 로컬 상태 초기화
       setUniversity("");
+      setMajor("");
     } catch (error) {
       console.error('계정 수정 실패:', error);
       if (error instanceof AxiosError && error.response?.data) {
@@ -147,10 +144,23 @@ export default function MyPage() {
     }
 
     try {
-      const updateData = {
+      const updateData: {
+        id: number;
+        recommendNickname: string;
+        university?: string;
+        major?: string;
+      } = {
         id: parseInt(user.userId),
         recommendNickname: inputReferral.trim()
       };
+
+      // 기존 학교, 학과 값이 있으면 함께 전송
+      if (user.university) {
+        updateData.university = user.university;
+      }
+      if (user.major) {
+        updateData.major = user.major;
+      }
 
       await updateUser.mutateAsync(updateData);
       showAlert("추천인 코드가 입력되었습니다. 문제 생성 횟수가 1회 추가됩니다.");
@@ -197,41 +207,28 @@ export default function MyPage() {
             />
           </div>
 
-          {/* 비밀번호 변경 */}
-          <div>
-            <label className="block text-sm font-medium text-black mb-2">새 비밀번호 (선택)</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
-              placeholder="변경하려면 입력하세요"
-            />
-          </div>
-
           {/* 대학교 + 학과 */}
           <div className="space-y-4">
-            <div className="flex gap-2">
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">대학교</label>
               <input
                 type="text"
                 value={displayUniversity}
                 onChange={(e) => setUniversity(e.target.value)}
-                placeholder="대학교 검색"
-                className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
-            />
-              <button
-                type="button"
-                className="px-4 py-2 bg-[#D9EAFD] text-black rounded hover:bg-[#BCCCDC] transition whitespace-nowrap"
-              >
-                검색
-              </button>
+                placeholder="대학교를 입력해주세요"
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
+              />
             </div>
-            <input
-              type="text"
-              value={user.major || ""}
-              disabled
-              className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:outline-none cursor-not-allowed border border-[#BCCCDC]"
-            />
+            <div>
+              <label className="block text-sm font-medium text-black mb-2">학과</label>
+              <input
+                type="text"
+                value={displayMajor}
+                onChange={(e) => setMajor(e.target.value)}
+                placeholder="학과를 입력해주세요"
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
+              />
+            </div>
           </div>
 
           {/* 수정하기 버튼 */}

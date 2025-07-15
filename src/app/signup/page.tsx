@@ -159,6 +159,7 @@ export default function SignupPage() {
         password: formData.password,
         university: formData.university,
         major: formData.major,
+        recommendNickname: formData.referralCode,
         freeCount: 5,
         recommendCount: formData.referralCode ? 1 : 0
       });
