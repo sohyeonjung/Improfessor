@@ -42,7 +42,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/generate" className="text-2xl font-bold text-black">
-            나는 교수다
+            내가 교수님
             </Link>
           </div>
 

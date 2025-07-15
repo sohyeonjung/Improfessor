@@ -89,7 +89,7 @@ export default function GeneratePage() {
         {/* 페이지 제목과 설명 */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-black mb-4">
-            나는 교수다
+            내가 교수님
           </h1>
           <p className="text-lg text-black">
             자료 업로드 후 문제 생성하기 버튼을 눌러주세요

@@ -20,7 +20,7 @@ export default function Home() {
       <div className="container mx-auto px-4 min-h-screen flex flex-col items-center justify-center relative z-10">
         <main className="flex flex-col items-center text-center">
           <h1 className="text-5xl md:text-7xl font-bold text-black mb-8">
-            나는 교수다
+            내가 교수님
           </h1>
           <p className="text-xl text-black mb-12 max-w-2xl">
             PDF 파일을 업로드하면 AI가 자동으로 학습문제를 생성해주는 스마트한 교육 플랫폼

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "나는 교수다",
+  title: "내가 교수님",
   description: "AI 기반 학습문제 생성 플랫폼",
 };
 
