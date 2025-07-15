@@ -101,7 +101,7 @@ export default function GeneratePage() {
           <div className="bg-white shadow">
             <div className="px-6 py-8">
               <h2 className="text-2xl font-bold text-black mb-4">
-                수업 자료 업로드
+                수업 자료 업로드 (필수)
               </h2>
 
               <p className="text-black mb-8">
@@ -155,7 +155,7 @@ export default function GeneratePage() {
                     />
                   </svg>
                   <span className="text-sm text-black mb-2">
-                    {conceptFileName || '파일 선택하기'}
+                    {conceptFileName || '파일 선택하기 (필수)'}
                   </span>
                   <span className="text-xs text-black">
                     (pdf, ppt 파일만 가능, 각 15MB 이하)
@@ -169,7 +169,7 @@ export default function GeneratePage() {
           <div className="bg-white shadow">
             <div className="px-6 py-8">
               <h2 className="text-2xl font-bold text-black mb-4">
-                족보 올리기
+                족보 올리기 (선택)
               </h2>
 
               <p className="text-black mb-8">
@@ -224,7 +224,7 @@ export default function GeneratePage() {
                     />
                   </svg>
                   <span className="text-sm text-black mb-2">
-                    {formatFileName || '파일 선택하기'}
+                    {formatFileName || '파일 선택하기 (선택)'}
                   </span>
                   <span className="text-xs text-black">
                     (pdf, ppt 파일만 가능, 각 15MB 이하)
