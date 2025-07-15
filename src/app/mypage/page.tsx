@@ -18,8 +18,8 @@ export default function MyPage() {
   const { showAlert, showConfirm } = useAlert();
 
   // 로컬 상태 (수정 가능한 필드들)
-  const [university, setUniversity] = useState("");
-  const [major, setMajor] = useState("");
+  const [university, setUniversity] = useState<string | null>(null);
+  const [major, setMajor] = useState<string | null>(null);
   const [inputReferral, setInputReferral] = useState("");
 
   // 인증되지 않은 경우 로그인 페이지로 리다이렉트
@@ -70,13 +70,13 @@ export default function MyPage() {
   }
 
   // 사용자 정보가 로드되면 로컬 상태 업데이트 (초기화 시에만)
-  const displayUniversity = university !== "" ? university : (user.university || "");
-  const displayMajor = major !== "" ? major : (user.major || "");
+  const displayUniversity = university !== null ? university : (user.university || "");
+  const displayMajor = major !== null ? major : (user.major || "");
 
   // 변경사항이 있는지 확인
   const hasChanges = () => {
-    const universityChanged = university !== "" && university !== (user.university || "");
-    const majorChanged = major !== "" && major !== (user.major || "");
+    const universityChanged = university !== null && university !== (user.university || "");
+    const majorChanged = major !== null && major !== (user.major || "");
     
     return universityChanged || majorChanged;
   };
@@ -85,22 +85,22 @@ export default function MyPage() {
     try {
       const updateData: {
         id: number;
-        university?: string;
-        major?: string;
+        university?: string | null;
+        major?: string | null;
         recommendNickname?: string;
       } = {
         id: parseInt(user.userId)
       };
       
       // 대학교 처리: 수정된 값이 있으면 수정값, 없으면 기존값 유지
-      if (university !== "") {
+      if (university !== null) {
         updateData.university = university;
       } else if (user.university) {
         updateData.university = user.university;
       }
       
       // 학과 처리: 수정된 값이 있으면 수정값, 없으면 기존값 유지
-      if (major !== "") {
+      if (major !== null) {
         updateData.major = major;
       } else if (user.major) {
         updateData.major = user.major;
@@ -109,8 +109,8 @@ export default function MyPage() {
       await updateUser.mutateAsync(updateData);
       showAlert("계정 정보가 수정되었습니다.");
       // 수정 후 로컬 상태 초기화
-      setUniversity("");
-      setMajor("");
+      setUniversity(null);
+      setMajor(null);
     } catch (error) {
       console.error('계정 수정 실패:', error);
       if (error instanceof AxiosError && error.response?.data) {

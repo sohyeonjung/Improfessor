@@ -32,8 +32,8 @@ export interface UpdateUserRequest {
   id?: number;
   nickname?: string;
   password?: string;
-  university?: string;
-  major?: string;
+  university?: string | null;
+  major?: string | null;
   recommendNickname?: string;
   freeCount?: number;
   recommendCount?: number;
