@@ -1,12 +1,14 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { axiosInstance } from '@/lib/axios';
 import { GenerateProblemResponse, GenerateProblemRequest, Problem } from '@/types/problem';
 import { useUser } from '@/context/UserContext';
+import { ApiResponse, UserInfo } from '@/types/auth';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 export const useProblem = () => {
   const { user } = useUser();
+  const queryClient = useQueryClient();
 
   // 문제 생성
   const useGenerateProblem = () => {
@@ -32,6 +34,66 @@ export const useProblem = () => {
           },
         });
         return response.data as GenerateProblemResponse;
+      },
+      onMutate: async () => {
+        const userId = user?.userId;
+        const previousById = userId
+          ? queryClient.getQueryData<ApiResponse<UserInfo>>(['userInfo', userId])
+          : undefined;
+        const previousGeneric = queryClient.getQueryData<ApiResponse<UserInfo>>(['userInfo']);
+
+        if (userId) {
+          queryClient.setQueryData<ApiResponse<UserInfo> | undefined>(
+            ['userInfo', userId],
+            (prev) => {
+              if (!prev || !prev.data) return prev;
+              return {
+                ...prev,
+                data: {
+                  ...prev.data,
+                  freeCount: Math.max(0, (prev.data.freeCount ?? 0) - 1),
+                },
+              };
+            }
+          );
+        }
+
+        if (previousGeneric) {
+          queryClient.setQueryData<ApiResponse<UserInfo> | undefined>(
+            ['userInfo'],
+            (prev) => {
+              if (!prev || !prev.data) return prev;
+              return {
+                ...prev,
+                data: {
+                  ...prev.data,
+                  freeCount: Math.max(0, (prev.data.freeCount ?? 0) - 1),
+                },
+              };
+            }
+          );
+        }
+
+        return { previousById, previousGeneric } as {
+          previousById?: ApiResponse<UserInfo>;
+          previousGeneric?: ApiResponse<UserInfo>;
+        };
+      },
+      onError: (_error, _variables, context) => {
+        const userId = user?.userId;
+        if (userId && context?.previousById !== undefined) {
+          queryClient.setQueryData(['userInfo', userId], context.previousById);
+        }
+        if (context?.previousGeneric !== undefined) {
+          queryClient.setQueryData(['userInfo'], context.previousGeneric);
+        }
+      },
+      onSettled: () => {
+        const userId = user?.userId;
+        if (userId) {
+          queryClient.invalidateQueries({ queryKey: ['userInfo', userId] });
+        }
+        queryClient.invalidateQueries({ queryKey: ['userInfo'] });
       },
     });
   };
