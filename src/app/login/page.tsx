@@ -81,54 +81,52 @@ export default function LoginPage() {
       <div className="flex items-center justify-center min-h-screen relative z-10">
         <div className="bg-white p-8 shadow-lg w-full max-w-md rounded-lg">
           <h1 className="text-4xl font-bold text-center text-black mb-8">로그인</h1>
-          
+
+          {/* 이메일/비밀번호 입력 */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-2">
-                이메일
-              </label>
               <input
                 type="email"
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
-                placeholder="your@email.com"
+                className="w-full px-4 py-3 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+                placeholder="이메일 입력"
                 required
               />
             </div>
-            
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-2">
-                비밀번호
-              </label>
               <input
                 type="password"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
-                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+                placeholder="비밀번호 입력"
                 required
               />
             </div>
-
             <button
               type="submit"
               disabled={login.isPending}
-              className="w-full bg-[#D9EAFD] text-black py-3 rounded-lg hover:bg-[#BCCCDC] transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-black text-white py-3 rounded-lg hover:bg-black/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {login.isPending ? "로그인 중..." : "로그인"}
             </button>
           </form>
 
+          {/* 카카오로 계속하기 박스 */}
+          <div className="mt-4">
+            <div className="w-full py-3 rounded-lg text-center font-medium bg-[#FEE500] text-black cursor-default select-none">
+              카카오톡으로 계속하기
+            </div>
+          </div>
+
+          {/* 회원가입 링크 */}
           <div className="mt-6 text-center">
-            <p className="text-black">
-              계정이 없으신가요?{" "}
-              <Link href="/signup" className="text-black hover:text-[#BCCCDC] transition">
-                회원가입
-              </Link>
-            </p>
+            <Link href="/signup" className="text-black/70 hover:text-black transition">
+              이메일로 회원가입
+            </Link>
           </div>
         </div>
       </div>

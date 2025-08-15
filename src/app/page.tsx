@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
+import { useAlert } from "@/context/AlertContext";
 
 export default function Home() {
   const { isAuthenticated } = useUser();
+  const { showAlert } = useAlert();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#D9EAFD] to-[#F8FAFC] relative">
@@ -26,31 +28,33 @@ export default function Home() {
             PDF 파일을 업로드하면 AI가 자동으로 학습문제를 생성해주는 스마트한 교육 플랫폼
           </p>
           
-          <div className="flex gap-6">
-            {isAuthenticated ? (
+          {isAuthenticated ? (
+            <div className="flex gap-6">
               <Link 
                 href="/generate"
-                className="px-8 py-3 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition"
+                className="px-10 py-3 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition"
               >
                 문제 생성하기
               </Link>
-            ) : (
-              <>
-                <Link 
-                  href="/login"
-                  className="px-8 py-3 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition"
-                >
-                  로그인
-                </Link>
-                <Link
-                  href="/signup"
-                  className="px-8 py-3 bg-white text-black border border-[#BCCCDC] rounded-lg hover:bg-[#F8FAFC] transition"
-                >
-                  회원가입
-                </Link>
-              </>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-4">
+              <button
+                onClick={() => showAlert('게스트로그인은 준비중입니다')}
+                className="px-10 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition"
+              >
+                시작하기
+              </button>
+              <p className="text-black/70">
+                이미 회원이라면?{' '}
+                <Link href="/login" className="underline hover:text-black transition">로그인</Link>
+                {' '}
+                |
+                {' '}
+                <Link href="/signup" className="underline hover:text-black transition">회원가입</Link>
+              </p>
+            </div>
+          )}
         </main>
       </div>
     </div>
