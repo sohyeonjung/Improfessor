@@ -13,7 +13,7 @@ interface University {
 interface UniversitySearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (university: string) => void;
+  onSelect: (university: string, universityId: string) => void;
 }
 
 export default function UniversitySearchModal({ 
@@ -27,24 +27,23 @@ export default function UniversitySearchModal({
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
-  const API_KEY = 'qqE4EUYf7PqLHIAzLTlLONl%2BDy%2BQ0HSFXzz9rRHcRCxmwCMilL8Of9ay7py2Fc%2FUWx%2BHMHHV7GGLvEeZMhgHLA%3D%3D';
-
   // 대학교 검색
   const searchUniversities = async (keyword: string, page: number = 1) => {
-    if (!keyword.trim()) return;
+    if (!keyword.trim()) {
+      setUniversities([]);
+      setTotalCount(0);
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const baseUrl = 'http://openapi.academyinfo.go.kr/openapi/service/rest/SchoolMajorInfoService/getSchoolMajorInfo';
       const params = new URLSearchParams({
-        serviceKey: API_KEY,
-        pageNo: page.toString(),
-        numOfRows: '20',
-        svyYr: '2025',
-        schlKrnNm: keyword
+        type: 'university',
+        keyword,
+        page: page.toString()
       });
 
-      const response = await fetch(`${baseUrl}?${params}`);
+      const response = await fetch(`/api/university?${params}`);
       const xmlText = await response.text();
       
       // XML을 파싱하여 대학교 목록 추출
@@ -91,7 +90,7 @@ export default function UniversitySearchModal({
 
   // 대학교 선택
   const handleUniversitySelect = (university: University) => {
-    onSelect(university.schlNm);
+    onSelect(university.schlNm, university.schlId);
     onClose();
   };
 
@@ -111,7 +110,7 @@ export default function UniversitySearchModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-black">대학교 검색</h2>

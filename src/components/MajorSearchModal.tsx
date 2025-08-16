@@ -16,13 +16,15 @@ interface MajorSearchModalProps {
   onClose: () => void;
   onSelect: (major: string) => void;
   selectedUniversity: string;
+  selectedUniversityId: string;
 }
 
 export default function MajorSearchModal({ 
   isOpen, 
   onClose, 
   onSelect,
-  selectedUniversity
+  selectedUniversity,
+  selectedUniversityId
 }: MajorSearchModalProps) {
   const { showAlert } = useAlert();
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -30,22 +32,23 @@ export default function MajorSearchModal({
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
-  const API_KEY = 'qqE4EUYf7PqLHIAzLTlLONl%2BDy%2BQ0HSFXzz9rRHcRCxmwCMilL8Of9ay7py2Fc%2FUWx+HMHHV7GGLvEeZMhgHLA%3D%3D';
-
   // 학과 검색
   const searchMajors = async (keyword: string = '', page: number = 1) => {
+    if (!selectedUniversityId) {
+      setMajors([]);
+      setTotalCount(0);
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const baseUrl = 'http://openapi.academyinfo.go.kr/openapi/service/rest/SchoolMajorInfoService/getSchoolMajorInfo';
       const params = new URLSearchParams({
-        serviceKey: API_KEY,
-        pageNo: page.toString(),
-        numOfRows: '50',
-        svyYr: '2025',
-        schlKrnNm: selectedUniversity
+        type: 'major',
+        universityId: selectedUniversityId,
+        page: page.toString()
       });
 
-      const response = await fetch(`${baseUrl}?${params}`);
+      const response = await fetch(`/api/university?${params}`);
       const xmlText = await response.text();
       
       // XML을 파싱하여 학과 목록 추출
@@ -103,12 +106,12 @@ export default function MajorSearchModal({
     searchMajors(searchKeyword, 1);
   };
 
-  // 모달이 열릴 때 학과 목록 로드
-  const handleOpen = () => {
-    if (isOpen && selectedUniversity) {
-      searchMajors();
-    }
-  };
+  // 모달이 열릴 때 학과 목록 로드 (사용하지 않음)
+  // const handleOpen = () => {
+  //   if (isOpen && selectedUniversityId) {
+  //     searchMajors();
+  //   }
+  // };
 
   // 모달 닫기
   const handleClose = () => {
@@ -118,15 +121,15 @@ export default function MajorSearchModal({
     onClose();
   };
 
-  // 모달이 열릴 때마다 학과 목록 로드
-  if (isOpen && selectedUniversity && majors.length === 0 && !isLoading) {
-    handleOpen();
-  }
+  // 모달이 열릴 때마다 학과 목록 로드 (검색 버튼을 눌러야만 로드)
+  // if (isOpen && selectedUniversityId && majors.length === 0 && !isLoading) {
+  //   handleOpen();
+  // }
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-hidden shadow-xl">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-black">학과 검색</h2>

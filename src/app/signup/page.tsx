@@ -25,6 +25,7 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
     university: "",
+    universityId: "",
     major: "",
     referralCode: "",
   });
@@ -87,10 +88,11 @@ export default function SignupPage() {
     }
   };
 
-  const handleUniversitySelect = (university: string) => {
+  const handleUniversitySelect = (university: string, universityId: string) => {
     setFormData(prev => ({
       ...prev,
-      university
+      university,
+      universityId
     }));
   };
 
@@ -391,7 +393,7 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setIsMajorModalOpen(true)}
-                  disabled={!formData.university}
+                  disabled={!formData.universityId}
                   className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   검색
@@ -444,6 +446,7 @@ export default function SignupPage() {
         onClose={() => setIsMajorModalOpen(false)}
         onSelect={handleMajorSelect}
         selectedUniversity={formData.university}
+        selectedUniversityId={formData.universityId}
       />
     </div>
   );

@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const keyword = searchParams.get('keyword');
@@ -7,7 +18,7 @@ export async function GET(request: NextRequest) {
   const page = searchParams.get('page') || '1';
   const type = searchParams.get('type') || 'university';
 
-  const API_KEY = 'qqE4EUYf7PqLHIAzLTlLONl%2BDy%2BQ0HSFXzz9rRHcRCxmwCMilL8Of9ay7py2Fc%2FUWx+HMHHV7GGLvEeZMhgHLA%3D%3D';
+  const API_KEY = 'qqE4EUYf7PqLHIAzLTlLONl+Dy+Q0HSFXzz9rRHcRCxmwCMilL8Of9ay7py2Fc/UWx+HMHHV7GGLvEeZMhgHLA==';
 
   try {
     const baseUrl = 'http://openapi.academyinfo.go.kr/openapi/service/rest/SchoolMajorInfoService/getSchoolMajorInfo';
@@ -15,7 +26,7 @@ export async function GET(request: NextRequest) {
       serviceKey: API_KEY,
       pageNo: page,
       numOfRows: type === 'university' ? '20' : '50',
-              svyYr: '2025'
+      svyYr: '2025'
     });
 
     if (type === 'university' && keyword) {
@@ -24,18 +35,28 @@ export async function GET(request: NextRequest) {
       params.append('schlId', universityId);
     }
 
-    const response = await fetch(`${baseUrl}?${params}`);
+    const requestUrl = `${baseUrl}?${params}`;
+    console.log('=== 공공데이터 API 요청 정보 ===');
+    console.log('요청 URL:', requestUrl);
+    console.log('파라미터:', Object.fromEntries(params.entries()));
+    console.log('API 키 (디코딩):', decodeURIComponent(API_KEY));
+    console.log('================================');
+
+    const response = await fetch(requestUrl);
     
     if (!response.ok) {
       throw new Error(`API 요청 실패: ${response.status}`);
     }
 
     const xmlText = await response.text();
+    console.log('공공데이터 API 응답:', xmlText.substring(0, 500) + '...');
     
     return new NextResponse(xmlText, {
       headers: {
         'Content-Type': 'application/xml',
         'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
     });
   } catch (error) {
