@@ -1,14 +1,16 @@
 'use client';
 
 import Header from "@/components/Header";
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import useProblem from "@/hooks/useProblem";
 import { useAlert } from "@/context/AlertContext";
 import { useUser } from "@/context/UserContext";
+import { axiosInstance } from "@/lib/axios";
 
 export default function GeneratePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showAlert } = useAlert();
   const { user, isAuthenticated } = useUser();
   const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +21,53 @@ export default function GeneratePage() {
 
   const { useGenerateProblem } = useProblem();
   const generateProblemMutation = useGenerateProblem();
+
+  // 카카오 리다이렉트 처리: 쿼리에서 토큰 수신 시 저장 및 헤더 설정
+  useEffect(() => {
+    const accessToken = searchParams.get('accessToken');
+    const refreshToken = searchParams.get('refreshToken');
+    const grantType = searchParams.get('grant_type');
+    const error = searchParams.get('error');
+    const message = searchParams.get('message');
+
+    // 에러 케이스 처리
+    if (error) {
+      console.error('[Kakao OAuth] Error:', { error, message });
+      showAlert(`카카오 로그인 실패: ${message || error}`);
+      // 쿼리스트링 정리
+      const url = new URL(window.location.href);
+      url.searchParams.delete('error');
+      url.searchParams.delete('message');
+      window.history.replaceState({}, '', url.toString());
+      return;
+    }
+
+    if (accessToken && refreshToken) {
+      // 디버깅: 카카오 OAuth 토큰 확인
+      console.log('[Kakao OAuth] tokens received', {
+        grantType,
+        accessToken,
+        refreshToken,
+      });
+
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+      
+      // 쿼리스트링 정리
+      const url = new URL(window.location.href);
+      url.searchParams.delete('accessToken');
+      url.searchParams.delete('refreshToken');
+      url.searchParams.delete('grant_type');
+      window.history.replaceState({}, '', url.toString());
+      
+      // 토큰 변경 이벤트 발생 (UserContext에서 상태 업데이트)
+      window.dispatchEvent(new Event('tokenChange'));
+      
+      // 환영 안내
+      showAlert('카카오 로그인에 성공했어요!');
+    }
+  }, [searchParams, showAlert]);
 
   const handleConceptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

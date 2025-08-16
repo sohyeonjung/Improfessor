@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
@@ -13,6 +13,19 @@ export default function LoginPage() {
   const { useLogin } = useAuth();
   const login = useLogin();
   const { showAlert } = useAlert();
+  const [kakaoUrl, setKakaoUrl] = useState<string>("https://api.improfessor.co.kr/oauth2/authorization/kakao");
+
+  // 로컬 개발환경에서 리다이렉트 URI를 localhost로 설정
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocal) {
+        const url = new URL('https://api.improfessor.co.kr/oauth2/authorization/kakao');
+        url.searchParams.set('redirect_uri', 'http://localhost:5173/generate');
+        setKakaoUrl(url.toString());
+      }
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -115,11 +128,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* 카카오로 계속하기 박스 */}
+          {/* 카카오로 계속하기 */}
           <div className="mt-4">
-            <div className="w-full py-3 rounded-lg text-center font-medium bg-[#FEE500] text-black cursor-default select-none">
+            <a
+              href={kakaoUrl}
+              className="block w-full py-3 rounded-lg text-center font-medium bg-[#FEE500] text-black hover:brightness-95 transition"
+            >
               카카오톡으로 계속하기
-            </div>
+            </a>
           </div>
 
           {/* 회원가입 링크 */}

@@ -40,11 +40,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         const extractedUserId = getUserIdFromToken();
         // 토큰이 있으면 userId를 설정 (디코딩 실패해도 null로 설정)
         setUserId(extractedUserId);
+        console.log('[UserContext] Token found, userId:', extractedUserId);
       } else {
         // 토큰이 없는 경우 userId를 null로 설정하고 사용자 정보 캐시 제거
         setUserId(null);
         queryClient.removeQueries({ queryKey: ['userInfo'] });
         queryClient.removeQueries({ queryKey: ['userInfo', null] });
+        console.log('[UserContext] No token found, userId set to null');
       }
     };
 
@@ -53,12 +55,14 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     // storage 이벤트 리스너
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'accessToken') {
+        console.log('[UserContext] Storage change detected for accessToken');
         checkToken();
       }
     };
 
     // 커스텀 이벤트 리스너
     const handleTokenChange = () => {
+      console.log('[UserContext] Token change event received');
       checkToken();
     };
 
@@ -83,7 +87,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       if (!userId) {
         throw new Error('사용자 ID가 없습니다.');
       }
+      console.log('[UserContext] Fetching user info for userId:', userId);
       const response = await axiosInstance.get(`/api/users/${userId}`);
+      console.log('[UserContext] User info received:', response.data);
       return response.data;
     },
     enabled: !!userId,

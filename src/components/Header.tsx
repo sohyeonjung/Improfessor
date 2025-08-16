@@ -13,6 +13,11 @@ export default function Header() {
   const logoutMutation = useLogout();
   const { user, isLoading: userLoading, isAuthenticated } = useUser();
 
+  // 디버깅: 로그인 상태 확인
+  useEffect(() => {
+    console.log('[Header] Auth state:', { isAuthenticated, user, userLoading });
+  }, [isAuthenticated, user, userLoading]);
+
   // 초기 토큰 설정
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
