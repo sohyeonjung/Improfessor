@@ -72,6 +72,14 @@ export default function GeneratePage() {
   const handleConceptFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 파일 크기 체크 (15MB = 15 * 1024 * 1024 bytes)
+      const maxSize = 15 * 1024 * 1024; // 15MB
+      if (file.size > maxSize) {
+        showAlert('파일 크기가 15MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+        e.target.value = ''; // 파일 선택 초기화
+        setConceptFileName('');
+        return;
+      }
       setConceptFileName(file.name);
     }
   };
@@ -87,6 +95,14 @@ export default function GeneratePage() {
   const handleFormatFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // 파일 크기 체크 (15MB = 15 * 1024 * 1024 bytes)
+      const maxSize = 15 * 1024 * 1024; // 15MB
+      if (file.size > maxSize) {
+        showAlert('파일 크기가 15MB를 초과합니다. 더 작은 파일을 선택해주세요.');
+        e.target.value = ''; // 파일 선택 초기화
+        setFormatFileName('');
+        return;
+      }
       setFormatFileName(file.name);
     }
   };
@@ -110,9 +126,30 @@ export default function GeneratePage() {
       return;
     }
 
+    // 파일 크기 재체크
+    const maxSize = 15 * 1024 * 1024; // 15MB
+    for (let i = 0; i < conceptFiles.length; i++) {
+      if (conceptFiles[i].size > maxSize) {
+        showAlert(`수업 자료 파일 "${conceptFiles[i].name}"의 크기가 15MB를 초과합니다.`);
+        return;
+      }
+    }
+
     setIsLoading(true);
     try {
       const formatFiles = formatFileRef.current?.files;
+      
+      // 족보 파일 크기 체크
+      if (formatFiles) {
+        for (let i = 0; i < formatFiles.length; i++) {
+          if (formatFiles[i].size > maxSize) {
+            showAlert(`족보 파일 "${formatFiles[i].name}"의 크기가 15MB를 초과합니다.`);
+            setIsLoading(false);
+            return;
+          }
+        }
+      }
+
       const response = await generateProblemMutation.mutateAsync({
         conceptFiles: Array.from(conceptFiles),
         formatFiles: formatFiles ? Array.from(formatFiles) : undefined,
