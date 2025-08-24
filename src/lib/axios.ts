@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.improfessor.co.kr/',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.improfessor.kro.kr',
   headers: {
     'Content-Type': 'application/json',
   },
