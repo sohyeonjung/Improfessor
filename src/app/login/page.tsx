@@ -20,7 +20,7 @@ export default function LoginPage() {
     if (typeof window !== 'undefined') {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isLocal) {
-        const url = new URL('https://api.improfessor.co.kr/oauth2/authorization/kakao');
+        const url = new URL('https://api.improfessor.kro.kr/login/oauth2/code/kakao');
         url.searchParams.set('redirect_uri', 'http://localhost:5173/generate');
         setKakaoUrl(url.toString());
       }
