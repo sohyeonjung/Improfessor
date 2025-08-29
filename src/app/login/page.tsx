@@ -13,7 +13,7 @@ export default function LoginPage() {
   const { useLogin } = useAuth();
   const login = useLogin();
   const { showAlert } = useAlert();
-  const [kakaoUrl, setKakaoUrl] = useState<string>("https://api.improfessor.co.kr/oauth2/authorization/kakao");
+  const [kakaoUrl, setKakaoUrl] = useState<string>("https://api.improfessor.kro.kr/login/oauth2/code/kakao");
 
   // 로컬 개발환경에서 리다이렉트 URI를 localhost로 설정
   useEffect(() => {
