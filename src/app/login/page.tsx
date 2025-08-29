@@ -21,7 +21,7 @@ export default function LoginPage() {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       if (isLocal) {
         const url = new URL('https://api.improfessor.kro.kr/login/oauth2/code/kakao');
-        url.searchParams.set('redirect_uri', 'https://api.improfessor.kro.kr/generate');
+        url.searchParams.set('redirect_uri', 'https://improfessor.vercel.app/generate');
         setKakaoUrl(url.toString());
       }
     }
