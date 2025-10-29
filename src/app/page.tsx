@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
-import { useAlert } from "@/context/AlertContext";
 
 export default function Home() {
   const { isAuthenticated } = useUser();
-  const { showAlert } = useAlert();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#D9EAFD] to-[#F8FAFC] relative">
@@ -45,7 +43,6 @@ export default function Home() {
               >
                 로그인
               </Link>
-
               <p className="text-black/70">
                 비회원이라면?{' '}
                 <Link href="/signup" className="underline hover:text-black transition">
