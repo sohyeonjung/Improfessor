@@ -238,15 +238,14 @@ export default function MyPage() {
                   onChange={(e) => setUniversity(e.target.value)}
                   placeholder="대학교를 입력해주세요"
                   className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
-                  readOnly
                 />
-                {/* <button
+                <button
                   type="button"
                   onClick={() => setIsUniversityModalOpen(true)}
                   className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap"
                 >
                   검색
-                </button> */}
+                </button>
               </div>
             </div>
             <div>

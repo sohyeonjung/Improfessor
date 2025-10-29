@@ -353,52 +353,37 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label htmlFor="university" className="block text-sm font-medium text-black mb-2">
+              <label
+                htmlFor="university"
+                className="block text-sm font-medium text-black mb-2"
+              >
                 대학교 <span className="text-black/50">(선택)</span>
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  id="university"
-                  value={formData.university}
-                  onChange={handleChange}
-                  className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
-                  placeholder="대학교를 입력해주세요"
-                  readOnly
-                />
-                {/* <button
-                  type="button"
-                  onClick={() => setIsUniversityModalOpen(true)}
-                  className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap"
-                >
-                  검색
-                </button> */}
-              </div>
+              <input
+                type="text"
+                id="university"
+                value={formData.university}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+                placeholder="대학교를 입력해주세요"
+              />
             </div>
 
             <div>
-              <label htmlFor="major" className="block text-sm font-medium text-black mb-2">
+              <label
+                htmlFor="major"
+                className="block text-sm font-medium text-black mb-2"
+              >
                 학과 <span className="text-black/50">(선택)</span>
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  id="major"
-                  value={formData.major}
-                  onChange={handleChange}
-                  className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
-                  placeholder="학과를 입력해주세요"
-                  readOnly
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsMajorModalOpen(true)}
-                  disabled={!formData.universityId}
-                  className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  검색
-                </button>
-              </div>
+              <input
+                type="text"
+                id="major"
+                value={formData.major}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+                placeholder="학과를 입력해주세요"
+              />
             </div>
 
             <div>

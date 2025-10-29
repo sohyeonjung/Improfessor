@@ -244,7 +244,7 @@ export default function GeneratePage() {
                     {conceptFileName || '파일 선택하기 (필수)'}
                   </span>
                   <span className="text-xs text-black">
-                    (pdf, ppt 파일만 가능, 각 15MB 이하)
+                    (pdf 파일만 가능, 각 15MB 이하)
                   </span>
                 </label>
               </div>
@@ -265,7 +265,7 @@ export default function GeneratePage() {
               <div className="bg-[#F8FAFC] p-6 text-center border border-[#BCCCDC] rounded-lg">
                 <input
                   type="file"
-                  accept=".pdf,.ppt,.pptx"
+                  accept=".pdf"
                   className="hidden"
                   id="reference-upload"
                   ref={formatFileRef}
