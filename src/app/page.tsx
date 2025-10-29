@@ -39,19 +39,18 @@ export default function Home() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-4">
-              <button
-                onClick={() => showAlert('게스트로그인은 준비중입니다')}
+              <Link
+                href="/login"
                 className="px-10 py-3 bg-black text-white rounded-lg hover:bg-black/90 transition"
               >
-                시작하기
-              </button>
+                로그인
+              </Link>
+
               <p className="text-black/70">
-                이미 회원이라면?{' '}
-                <Link href="/login" className="underline hover:text-black transition">로그인</Link>
-                {' '}
-                |
-                {' '}
-                <Link href="/signup" className="underline hover:text-black transition">회원가입</Link>
+                비회원이라면?{' '}
+                <Link href="/signup" className="underline hover:text-black transition">
+                  회원가입
+                </Link>
               </p>
             </div>
           )}
