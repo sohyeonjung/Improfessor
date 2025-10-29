@@ -229,45 +229,28 @@ export default function MyPage() {
 
           {/* 대학교 + 학과 */}
           <div className="space-y-4">
+            {/* 대학교 */}
             <div>
               <label className="block text-sm font-medium text-black mb-2">대학교</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={displayUniversity}
-                  onChange={(e) => setUniversity(e.target.value)}
-                  placeholder="대학교를 입력해주세요"
-                  className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsUniversityModalOpen(true)}
-                  className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap"
-                >
-                  검색
-                </button>
-              </div>
+              <input
+                type="text"
+                value={displayUniversity}
+                onChange={(e) => setUniversity(e.target.value)}
+                placeholder="대학교를 입력해주세요"
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+              />
             </div>
+
+            {/* 학과 */}
             <div>
               <label className="block text-sm font-medium text-black mb-2">학과</label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={displayMajor}
-                  onChange={(e) => setMajor(e.target.value)}
-                  placeholder="학과를 입력해주세요"
-                  className="flex-1 px-4 py-2 bg-white border border-[#BCCCDC] rounded focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black"
-                  readOnly
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsMajorModalOpen(true)}
-                  disabled={!universityId}
-                  className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  검색
-                </button>
-              </div>
+              <input
+                type="text"
+                value={displayMajor}
+                onChange={(e) => setMajor(e.target.value)}
+                placeholder="학과를 입력해주세요"
+                className="w-full px-4 py-2 bg-white border border-[#BCCCDC] rounded-lg focus:ring-2 focus:ring-[#D9EAFD] focus:border-transparent text-black placeholder-black/50"
+              />
             </div>
           </div>
 
