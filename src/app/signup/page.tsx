@@ -366,13 +366,13 @@ export default function SignupPage() {
                   placeholder="대학교를 입력해주세요"
                   readOnly
                 />
-                <button
+                {/* <button
                   type="button"
                   onClick={() => setIsUniversityModalOpen(true)}
                   className="px-4 py-2 bg-[#D9EAFD] text-black rounded-lg hover:bg-[#BCCCDC] transition whitespace-nowrap"
                 >
                   검색
-                </button>
+                </button> */}
               </div>
             </div>
 
