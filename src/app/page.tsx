@@ -22,7 +22,7 @@ export default function Home() {
           <h1 className="text-5xl md:text-7xl font-bold text-black mb-8">
             내가 교수님
           </h1>
-          <p className="text-xl text-black mb-12 max-w-2xl">
+          <p className="text-xl text-black mb-12">
             PDF 파일을 업로드하면 AI가 자동으로 학습문제를 생성해주는 스마트한 교육 플랫폼
           </p>
           
